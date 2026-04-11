@@ -20,6 +20,7 @@ import { getStoredUser } from "../utils/auth";
 import Logo from "../components/Logo";
 import ChatHistory from "../components/ChatHistory";
 import ResearchModePanel from "../components/ResearchModePanel";
+import ResearchWorkspace from "../components/ResearchWorkspace";
 import ScholarSearch from "../components/ScholarSearch";
 
 interface Message {
@@ -58,6 +59,7 @@ export default function Chat() {
   const [showProviderMenu, setShowProviderMenu] = useState(false);
   const [researchMode, setResearchMode] = useState<string | null>(null);
   const [researchModes, setResearchModes] = useState<any[]>([]);
+  const [activeWorkspace, setActiveWorkspace] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
   const [showTools, setShowTools] = useState(false);
   const [responseFormat, setResponseFormat] = useState<"markdown" | "latex">("markdown");
@@ -322,7 +324,54 @@ export default function Chat() {
           </div>
         </div>
 
+        {/* Research Workspace (when a mode is opened) */}
+        {activeWorkspace && messages.length === 0 && (
+          <ResearchWorkspace
+            modeId={activeWorkspace}
+            onSendMessage={(msg) => {
+              setActiveWorkspace(null);
+              setInput(msg);
+              // Auto-send after a tick
+              setTimeout(() => {
+                const fakeEvent = { key: "Enter", shiftKey: false, preventDefault: () => {} };
+                // Set input and trigger send
+                setInput("");
+                const userMsg: Message = { role: "user", content: msg };
+                setMessages([userMsg, { role: "assistant", content: "" }]);
+                setStreaming(true);
+                streamChat(
+                  {
+                    provider,
+                    messages: [userMsg],
+                    conversation_id: convId,
+                    research_mode: researchMode,
+                    response_format: responseFormat === "latex" ? "latex" : undefined,
+                  },
+                  (chunk) => {
+                    setMessages((prev) => {
+                      const updated = [...prev];
+                      const last = updated[updated.length - 1];
+                      if (last.role === "assistant") last.content += chunk;
+                      return [...updated];
+                    });
+                  },
+                  () => setStreaming(false),
+                  (error) => {
+                    toast.error(error);
+                    setStreaming(false);
+                  }
+                );
+              }, 100);
+            }}
+            onClose={() => {
+              setActiveWorkspace(null);
+              setResearchMode(null);
+            }}
+          />
+        )}
+
         {/* Messages */}
+        {(!activeWorkspace || messages.length > 0) && (
         <div className="flex-1 overflow-y-auto px-3 sm:px-4 lg:px-6 py-4 space-y-4">
           {messages.length === 0 && (
             <div className="flex flex-col items-center justify-center h-full text-center px-4">
@@ -341,7 +390,15 @@ export default function Chat() {
                   <ResearchModePanel
                     modes={researchModes}
                     activeMode={researchMode}
-                    onSelect={setResearchMode}
+                    onSelect={(modeId) => {
+                      if (modeId) {
+                        setActiveWorkspace(modeId);
+                        setResearchMode(modeId);
+                      } else {
+                        setActiveWorkspace(null);
+                        setResearchMode(null);
+                      }
+                    }}
                   />
                 </div>
               )}
@@ -399,6 +456,7 @@ export default function Chat() {
           )}
           <div ref={messagesEndRef} />
         </div>
+        )}
 
         {/* Input */}
         <div className="border-t border-dark-500/30 bg-dark-800/50 p-3 sm:p-4 lg:px-6 safe-bottom">

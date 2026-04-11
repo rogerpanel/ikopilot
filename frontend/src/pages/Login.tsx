@@ -35,7 +35,7 @@ export default function Login() {
           <h1 className="mb-2">
             <Logo size="lg" />
           </h1>
-          <p className="text-gray-400">AI Research Assistant for Graduate Students</p>
+          <p className="text-gray-400">AI Research Assistant for University Students</p>
         </div>
 
         <form

@@ -118,9 +118,11 @@ export default function Profile() {
               className="w-full bg-dark-700 border border-dark-500 rounded-lg px-4 py-2.5 text-white focus:border-brand-blue focus:outline-none"
             >
               <option value="">Select...</option>
-              <option value="PhD">PhD</option>
+              <option value="BSc">BSc</option>
+              <option value="BA">BA</option>
               <option value="MSc">MSc</option>
               <option value="MA">MA</option>
+              <option value="PhD">PhD</option>
             </select>
           </div>
         </div>

@@ -57,6 +57,8 @@ class Program(str, enum.Enum):
     phd = "PhD"
     msc = "MSc"
     ma = "MA"
+    bsc = "BSc"
+    ba = "BA"
 
 
 # ---------- Models ----------
