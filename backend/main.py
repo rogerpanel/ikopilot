@@ -13,6 +13,8 @@ from projects import router as projects_router
 from research_modes import router as research_modes_router
 from supervisor import router as supervisor_router
 from admin import router as admin_router
+from file_upload import router as file_upload_router
+from history import router as history_router
 
 from sqlalchemy import select
 
@@ -73,6 +75,8 @@ app.include_router(projects_router)
 app.include_router(research_modes_router)
 app.include_router(supervisor_router)
 app.include_router(admin_router)
+app.include_router(file_upload_router)
+app.include_router(history_router)
 
 
 @app.get("/api/health")

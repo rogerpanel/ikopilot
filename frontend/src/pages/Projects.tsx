@@ -5,9 +5,13 @@ import {
   Trash2,
   MessageSquare,
   X,
+  FileText,
+  ChevronRight,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { apiFetch, apiPost, apiDelete } from "../utils/api";
+import { getStoredUser } from "../utils/auth";
+import FileUpload from "../components/FileUpload";
 
 interface Project {
   id: number;
@@ -23,11 +27,15 @@ export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
+  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [projectFiles, setProjectFiles] = useState<any[]>([]);
   const [form, setForm] = useState({
     title: "",
     description: "",
     research_field: "",
   });
+  const user = getStoredUser();
+  const canUpload = ["pro", "lab_group"].includes(user?.subscription_tier || "");
 
   const loadProjects = async () => {
     try {
@@ -165,46 +173,91 @@ export default function Projects() {
           </p>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {projects.map((project) => (
-            <div
-              key={project.id}
-              className="bg-dark-800 border border-dark-500/30 rounded-xl p-5 hover:border-dark-400/50 transition-colors"
-            >
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="font-semibold text-white">{project.title}</h3>
-                  {project.research_field && (
-                    <span className="inline-block text-xs bg-brand-blue/10 text-brand-blue px-2 py-0.5 rounded mt-1">
-                      {project.research_field}
-                    </span>
-                  )}
-                </div>
-                <button
-                  onClick={() => handleDelete(project.id)}
-                  className="text-gray-500 hover:text-red-400 transition-colors"
+        <div className="space-y-4">
+          {projects.map((project) => {
+            const isExpanded = expandedId === project.id;
+            return (
+              <div
+                key={project.id}
+                className="bg-dark-800 border border-dark-500/30 rounded-xl overflow-hidden transition-colors"
+              >
+                <div
+                  className="p-4 sm:p-5 cursor-pointer hover:bg-dark-700/30"
+                  onClick={() => {
+                    if (isExpanded) {
+                      setExpandedId(null);
+                    } else {
+                      setExpandedId(project.id);
+                      apiFetch(`/api/files/project/${project.id}`)
+                        .then(setProjectFiles)
+                        .catch(() => setProjectFiles([]));
+                    }
+                  }}
                 >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-              {project.description && (
-                <p className="text-sm text-gray-400 mt-2 line-clamp-2">
-                  {project.description}
-                </p>
-              )}
-              <div className="flex items-center gap-4 mt-4 text-xs text-gray-500">
-                <span className="flex items-center gap-1">
-                  <MessageSquare size={12} />
-                  {project.conversation_count} conversations
-                </span>
-                {project.updated_at && (
-                  <span>
-                    Updated {new Date(project.updated_at).toLocaleDateString()}
-                  </span>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start gap-2">
+                      <ChevronRight
+                        size={16}
+                        className={`text-gray-500 mt-1 transition-transform ${
+                          isExpanded ? "rotate-90" : ""
+                        }`}
+                      />
+                      <div>
+                        <h3 className="font-semibold text-white">{project.title}</h3>
+                        {project.research_field && (
+                          <span className="inline-block text-xs bg-brand-blue/10 text-brand-blue px-2 py-0.5 rounded mt-1">
+                            {project.research_field}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(project.id);
+                      }}
+                      className="text-gray-500 hover:text-red-400 transition-colors"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                  {project.description && (
+                    <p className="text-sm text-gray-400 mt-2 ml-6 line-clamp-2">
+                      {project.description}
+                    </p>
+                  )}
+                  <div className="flex items-center gap-4 mt-3 ml-6 text-xs text-gray-500">
+                    <span className="flex items-center gap-1">
+                      <MessageSquare size={12} />
+                      {project.conversation_count} conversations
+                    </span>
+                    {project.updated_at && (
+                      <span>
+                        Updated{" "}
+                        {new Date(project.updated_at).toLocaleDateString()}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Expanded: file upload section */}
+                {isExpanded && (
+                  <div className="px-4 sm:px-5 pb-4 sm:pb-5 border-t border-dark-500/20 pt-4">
+                    <h4 className="text-sm font-medium text-gray-300 mb-3 flex items-center gap-2">
+                      <FileText size={14} />
+                      Research Files
+                    </h4>
+                    <FileUpload
+                      projectId={project.id}
+                      files={projectFiles}
+                      onFilesChange={setProjectFiles}
+                      disabled={!canUpload}
+                    />
+                  </div>
                 )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

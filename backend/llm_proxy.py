@@ -106,8 +106,14 @@ def build_system_prompt(project: Optional[Project] = None, research_mode: Option
         mode_prompt = RESEARCH_MODE_PROMPTS.get(research_mode)
         if mode_prompt:
             prompt = f"{prompt}\n\n{mode_prompt}"
-    if project and project.system_prompt_override:
-        prompt = f"{prompt}\n\nProject context: {project.system_prompt_override}"
+    if project:
+        if project.system_prompt_override:
+            prompt = f"{prompt}\n\nProject context: {project.system_prompt_override}"
+        # Inject file context
+        from file_upload import get_project_context_text
+        file_context = get_project_context_text(project)
+        if file_context:
+            prompt = f"{prompt}\n{file_context}"
     return prompt
 
 

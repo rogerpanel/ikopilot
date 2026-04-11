@@ -18,6 +18,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+    volumes:
+      - uploads_prod:/app/uploads
     networks:
       - ikopilot-net
 
@@ -61,6 +63,7 @@ services:
 volumes:
   pgdata_prod:
   redisdata_prod:
+  uploads_prod:
 
 networks:
   ikopilot-net:
