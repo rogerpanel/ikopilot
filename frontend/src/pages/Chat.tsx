@@ -6,10 +6,12 @@ import {
   Loader2,
   ChevronDown,
   Sparkles,
-  History,
   X,
   PanelLeftClose,
   PanelLeftOpen,
+  BookOpen,
+  Code2,
+  FileCode,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import toast from "react-hot-toast";
@@ -18,6 +20,7 @@ import { getStoredUser } from "../utils/auth";
 import Logo from "../components/Logo";
 import ChatHistory from "../components/ChatHistory";
 import ResearchModePanel from "../components/ResearchModePanel";
+import ScholarSearch from "../components/ScholarSearch";
 
 interface Message {
   role: "user" | "assistant";
@@ -56,7 +59,8 @@ export default function Chat() {
   const [researchMode, setResearchMode] = useState<string | null>(null);
   const [researchModes, setResearchModes] = useState<any[]>([]);
   const [showHistory, setShowHistory] = useState(false);
-  const [showModes, setShowModes] = useState(false);
+  const [showTools, setShowTools] = useState(false);
+  const [responseFormat, setResponseFormat] = useState<"markdown" | "latex">("markdown");
   const [convId, setConvId] = useState<number | null>(
     conversationId ? parseInt(conversationId) : null
   );
@@ -126,6 +130,7 @@ export default function Chat() {
         messages: [...messages, userMsg],
         conversation_id: convId,
         research_mode: researchMode,
+        response_format: responseFormat === "latex" ? "latex" : undefined,
       },
       (chunk) => {
         setMessages((prev) => {
@@ -279,10 +284,41 @@ export default function Chat() {
                 </option>
               ))}
             </select>
+
+            {/* LaTeX toggle */}
+            <button
+              onClick={() =>
+                setResponseFormat(responseFormat === "latex" ? "markdown" : "latex")
+              }
+              className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs border transition-colors ${
+                responseFormat === "latex"
+                  ? "bg-yellow-500/10 border-yellow-500/30 text-yellow-400"
+                  : "bg-dark-700 border-dark-500 text-gray-400 hover:text-white"
+              }`}
+              title={responseFormat === "latex" ? "LaTeX mode ON" : "Switch to LaTeX output"}
+            >
+              <FileCode size={14} />
+              <span className="hidden sm:inline">LaTeX</span>
+            </button>
           </div>
 
-          <div className="text-xs text-gray-500 hidden sm:block">
-            {user?.tokens_used_today?.toLocaleString() || 0} tokens today
+          <div className="flex items-center gap-2">
+            {/* Scholar search toggle */}
+            <button
+              onClick={() => setShowTools(!showTools)}
+              className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs transition-colors ${
+                showTools
+                  ? "bg-brand-blue/10 text-brand-blue"
+                  : "text-gray-400 hover:text-white hover:bg-dark-700"
+              }`}
+              title="Paper search"
+            >
+              <BookOpen size={14} />
+              <span className="hidden sm:inline">Papers</span>
+            </button>
+            <div className="text-xs text-gray-500 hidden sm:block">
+              {user?.tokens_used_today?.toLocaleString() || 0} tokens today
+            </div>
           </div>
         </div>
 
@@ -387,6 +423,31 @@ export default function Chat() {
           </div>
         </div>
       </div>
+
+      {/* Research tools panel (right side) */}
+      {showTools && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+            onClick={() => setShowTools(false)}
+          />
+          <div className="fixed lg:static inset-y-0 right-0 z-40 w-80 bg-dark-800 border-l border-dark-500/30 flex flex-col">
+            <div className="h-12 flex items-center justify-between px-3 border-b border-dark-500/30">
+              <span className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                <BookOpen size={14} />
+                Paper Search
+              </span>
+              <button
+                onClick={() => setShowTools(false)}
+                className="text-gray-500 hover:text-white p-1 inline-btn"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <ScholarSearch projectId={null} />
+          </div>
+        </>
+      )}
     </div>
   );
 }

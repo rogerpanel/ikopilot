@@ -69,6 +69,7 @@ export async function streamChat(
     conversation_id?: number | null;
     project_id?: number | null;
     research_mode?: string | null;
+    response_format?: string | null;
     stream?: boolean;
   },
   onChunk: (text: string) => void,

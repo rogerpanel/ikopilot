@@ -43,12 +43,25 @@ class ChatMessage(BaseModel):
     content: str
 
 
+LATEX_SYSTEM_PROMPT = (
+    "\n\nIMPORTANT: The user has requested LaTeX output format. "
+    "Format all responses using LaTeX markup suitable for compilation in Overleaf. "
+    "Use \\section{}, \\subsection{}, \\textbf{}, \\textit{}, \\cite{}, "
+    "\\begin{itemize}/\\begin{enumerate} for lists, "
+    "\\begin{equation} for math, and \\begin{table} for tables. "
+    "Wrap code in \\begin{verbatim}. "
+    "Do NOT wrap the entire response in a document class — just provide the body content "
+    "that can be pasted into an existing LaTeX document."
+)
+
+
 class ChatRequest(BaseModel):
     provider: str = "deepseek"
     messages: list[ChatMessage]
     conversation_id: Optional[int] = None
     project_id: Optional[int] = None
     research_mode: Optional[str] = None
+    response_format: Optional[str] = None  # "markdown" or "latex"
     stream: bool = True
 
 
@@ -99,7 +112,7 @@ def get_api_key(provider: str) -> str:
     return key
 
 
-def build_system_prompt(project: Optional[Project] = None, research_mode: Optional[str] = None) -> str:
+def build_system_prompt(project: Optional[Project] = None, research_mode: Optional[str] = None, response_format: Optional[str] = None) -> str:
     prompt = ACADEMIC_SYSTEM_PROMPT
     if research_mode:
         from research_modes import RESEARCH_MODE_PROMPTS
@@ -114,6 +127,8 @@ def build_system_prompt(project: Optional[Project] = None, research_mode: Option
         file_context = get_project_context_text(project)
         if file_context:
             prompt = f"{prompt}\n{file_context}"
+    if response_format == "latex":
+        prompt = f"{prompt}{LATEX_SYSTEM_PROMPT}"
     return prompt
 
 
@@ -331,7 +346,7 @@ async def chat_completions(
         )
         project = result.scalar_one_or_none()
 
-    system_prompt = build_system_prompt(project, req.research_mode)
+    system_prompt = build_system_prompt(project, req.research_mode, req.response_format)
     messages = [{"role": m.role, "content": m.content} for m in req.messages]
 
     # Select provider stream

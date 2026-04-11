@@ -15,6 +15,7 @@ from supervisor import router as supervisor_router
 from admin import router as admin_router
 from file_upload import router as file_upload_router
 from history import router as history_router
+from scholar import router as scholar_router
 
 from sqlalchemy import select
 
@@ -77,6 +78,7 @@ app.include_router(supervisor_router)
 app.include_router(admin_router)
 app.include_router(file_upload_router)
 app.include_router(history_router)
+app.include_router(scholar_router)
 
 
 @app.get("/api/health")
