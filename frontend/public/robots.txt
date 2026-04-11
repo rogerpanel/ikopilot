@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Allow: /login
+Allow: /register
+Disallow: /chat
+Disallow: /projects
+Disallow: /profile
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://ikopilot.com/sitemap.xml

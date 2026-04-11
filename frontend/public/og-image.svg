@@ -1,0 +1,38 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#0a0e1a"/>
+  <rect x="0" y="0" width="1200" height="4" fill="#F97316"/>
+
+  <!-- Logo -->
+  <text x="600" y="200" font-family="system-ui, sans-serif" font-size="72" font-weight="700" text-anchor="middle">
+    <tspan fill="#F97316">i</tspan><tspan fill="#3B82F6">K</tspan><tspan fill="#F97316">o</tspan><tspan fill="#ffffff">pilot</tspan>
+  </text>
+
+  <!-- Tagline -->
+  <text x="600" y="270" font-family="system-ui, sans-serif" font-size="28" fill="#9CA3AF" text-anchor="middle">
+    AI Research Assistant for University Students
+  </text>
+
+  <!-- Features -->
+  <text x="600" y="350" font-family="system-ui, sans-serif" font-size="20" fill="#6B7280" text-anchor="middle">
+    Claude · GPT-4o · Gemini · DeepSeek
+  </text>
+
+  <text x="600" y="410" font-family="system-ui, sans-serif" font-size="18" fill="#4B5563" text-anchor="middle">
+    Literature Reviews · Methodology · Data Analysis · Academic Writing
+  </text>
+
+  <text x="600" y="450" font-family="system-ui, sans-serif" font-size="18" fill="#4B5563" text-anchor="middle">
+    Citation Manager · LaTeX Export · Paper Search · Thesis Outlines
+  </text>
+
+  <!-- CTA -->
+  <rect x="450" y="500" width="300" height="50" rx="10" fill="#F97316"/>
+  <text x="600" y="532" font-family="system-ui, sans-serif" font-size="20" fill="#ffffff" text-anchor="middle" font-weight="600">
+    Start Free Trial
+  </text>
+
+  <!-- URL -->
+  <text x="600" y="600" font-family="system-ui, sans-serif" font-size="16" fill="#6B7280" text-anchor="middle">
+    ikopilot.com
+  </text>
+</svg>

@@ -3,14 +3,107 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="description" content="iKopilot — AI research assistant for graduate students" />
+    <link rel="canonical" href="https://ikopilot.com/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+
+    <!-- Primary SEO -->
+    <title>iKopilot — AI Research Assistant for University Students</title>
+    <meta name="description" content="iKopilot is an AI-powered research assistant for university students. Get help with literature reviews, methodology, data analysis, academic writing, thesis outlines, and citations using Claude, GPT-4o, Gemini, and DeepSeek." />
+    <meta name="keywords" content="AI research assistant, academic writing tool, literature review AI, thesis writing help, research methodology, data analysis helper, citation manager, university students, graduate research, PhD assistant, masters thesis, bachelor project, academic AI, Overleaf LaTeX, BibTeX generator, research paper writing, dissertation help, statistical analysis" />
+    <meta name="author" content="iKopilot" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://ikopilot.com/" />
+    <meta property="og:title" content="iKopilot — AI Research Assistant for University Students" />
+    <meta property="og:description" content="Multi-LLM research assistant with Claude, GPT-4o, Gemini & DeepSeek. Literature reviews, methodology advice, data analysis, academic writing, thesis outlines, and citation management." />
+    <meta property="og:image" content="https://ikopilot.com/og-image.png" />
+    <meta property="og:site_name" content="iKopilot" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="iKopilot — AI Research Assistant for University Students" />
+    <meta name="twitter:description" content="Multi-LLM research assistant with Claude, GPT-4o, Gemini & DeepSeek. Literature reviews, methodology advice, data analysis, academic writing, and more." />
+    <meta name="twitter:image" content="https://ikopilot.com/og-image.png" />
+
+    <!-- PWA -->
     <meta name="theme-color" content="#0a0e1a" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <title>iKopilot — AI Research Assistant</title>
+    <meta name="apple-mobile-web-app-title" content="iKopilot" />
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "iKopilot",
+      "description": "AI-powered research assistant for university students. Provides literature review analysis, methodology advice, data analysis help, academic writing feedback, thesis outline building, and citation management using multiple AI models.",
+      "url": "https://ikopilot.com",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Web",
+      "offers": [
+        {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD",
+          "name": "Free Trial",
+          "description": "7-day free trial with 5,000 tokens/day"
+        },
+        {
+          "@type": "Offer",
+          "price": "9.99",
+          "priceCurrency": "USD",
+          "name": "Starter",
+          "description": "50,000 tokens/day, Claude + DeepSeek access"
+        },
+        {
+          "@type": "Offer",
+          "price": "24.99",
+          "priceCurrency": "USD",
+          "name": "Pro",
+          "description": "200,000 tokens/day, all 4 AI models, file upload"
+        },
+        {
+          "@type": "Offer",
+          "price": "49.99",
+          "priceCurrency": "USD",
+          "name": "Lab Group",
+          "description": "500,000 tokens/day shared, 5 seats, supervisor dashboard"
+        }
+      ],
+      "featureList": [
+        "Multi-LLM chat (Claude, GPT-4o, Gemini, DeepSeek)",
+        "8 research mode workflows",
+        "Literature review analysis",
+        "Research methodology advisor",
+        "Statistical analysis interpreter",
+        "Academic writing critic",
+        "Thesis outline builder",
+        "Abstract generator",
+        "Citation manager with BibTeX export",
+        "Paper search (OpenAlex, Semantic Scholar, CrossRef)",
+        "LaTeX output for Overleaf",
+        "PDF and document upload",
+        "APA, IEEE, Harvard citation formatting"
+      ],
+      "audience": {
+        "@type": "EducationalAudience",
+        "educationalRole": "student",
+        "description": "Bachelor's, Master's, and PhD university students"
+      }
+    }
+    </script>
   </head>
   <body class="bg-dark-900 text-white">
+    <noscript>
+      <div style="padding:2rem;text-align:center;color:#fff;background:#0a0e1a;min-height:100vh;">
+        <h1>iKopilot — AI Research Assistant</h1>
+        <p>iKopilot is an AI-powered research assistant for university students. Get help with literature reviews, research methodology, data analysis, academic writing, thesis outlines, and citation management.</p>
+        <p>Please enable JavaScript to use iKopilot.</p>
+      </div>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

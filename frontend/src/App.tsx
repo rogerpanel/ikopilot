@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { isAuthenticated, isAdmin } from "./utils/auth";
+import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Chat from "./pages/Chat";
@@ -35,10 +36,11 @@ export default function App() {
         }}
       />
       <Routes>
+        <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route
-          path="/"
+          path="/app"
           element={
             <PrivateRoute>
               <Layout />
@@ -46,6 +48,14 @@ export default function App() {
           }
         >
           <Route index element={<Navigate to="/chat" />} />
+        </Route>
+        <Route
+          element={
+            <PrivateRoute>
+              <Layout />
+            </PrivateRoute>
+          }
+        >
           <Route path="chat" element={<Chat />} />
           <Route path="chat/:conversationId" element={<Chat />} />
           <Route path="projects" element={<Projects />} />
