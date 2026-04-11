@@ -10,6 +10,7 @@ import {
   X,
 } from "lucide-react";
 import { clearAuth, getStoredUser, isAdmin } from "../utils/auth";
+import Logo from "./Logo";
 
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -48,11 +49,7 @@ export default function Layout() {
       >
         {/* Logo */}
         <div className="h-16 flex items-center px-6 border-b border-dark-500/30">
-          <span className="text-2xl font-bold">
-            <span className="text-brand-orange">i</span>
-            <span className="text-brand-blue">K</span>
-            <span className="text-white">opilot</span>
-          </span>
+          <Logo size="md" />
         </div>
 
         {/* Nav */}
@@ -114,10 +111,8 @@ export default function Layout() {
           >
             <Menu size={24} />
           </button>
-          <span className="ml-4 text-lg font-bold">
-            <span className="text-brand-orange">i</span>
-            <span className="text-brand-blue">K</span>
-            <span className="text-white">opilot</span>
+          <span className="ml-4">
+            <Logo size="sm" />
           </span>
         </div>
 

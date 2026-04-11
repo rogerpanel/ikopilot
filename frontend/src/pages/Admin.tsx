@@ -82,7 +82,7 @@ export default function Admin() {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="p-4 sm:p-6 max-w-6xl mx-auto">
       <h1 className="text-2xl font-bold flex items-center gap-2 mb-6">
         <Shield size={24} className="text-brand-orange" />
         Admin Dashboard

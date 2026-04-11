@@ -1,6 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <rect width="32" height="32" rx="6" fill="#111827"/>
-  <text x="4" y="24" font-family="system-ui, sans-serif" font-size="20" font-weight="700">
-    <tspan fill="#F97316">i</tspan><tspan fill="#3B82F6">K</tspan>
+  <!-- Fire dot -->
+  <path d="M8 4C8 4 5 8 5 11C5 13 6.3 14 8 14C9.7 14 11 13 11 11C11 8 8 4 8 4Z" fill="#F97316"/>
+  <path d="M8 7C8 7 6.2 9.5 6.2 11.2C6.2 12.2 7 13 8 13C9 13 9.8 12.2 9.8 11.2C9.8 9.5 8 7 8 7Z" fill="#FBBF24"/>
+  <!-- iKo -->
+  <text x="4" y="26" font-family="system-ui, sans-serif" font-size="16" font-weight="700">
+    <tspan fill="#F97316">i</tspan><tspan fill="#3B82F6">K</tspan><tspan fill="#F97316">o</tspan>
   </text>
 </svg>

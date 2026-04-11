@@ -93,9 +93,9 @@ def get_api_key(provider: str) -> str:
         "gemini": settings.google_api_key,
         "deepseek": settings.deepseek_api_key,
     }
-    key = keys.get(provider, "")
-    if not key:
-        raise HTTPException(status_code=503, detail=f"Provider {provider} not configured")
+    key = keys.get(provider, "").strip()
+    if not key or key.endswith("..."):
+        raise HTTPException(status_code=503, detail=f"Provider {provider} not configured. Ask your admin to add the API key.")
     return key
 
 
@@ -143,7 +143,12 @@ async def stream_anthropic(
         ) as response:
             if response.status_code != 200:
                 body = await response.aread()
-                raise HTTPException(status_code=502, detail=f"Anthropic error: {body.decode()}")
+                try:
+                    err = json.loads(body.decode())
+                    msg = err.get("error", {}).get("message", body.decode()[:200])
+                except (json.JSONDecodeError, KeyError):
+                    msg = body.decode()[:200]
+                raise HTTPException(status_code=502, detail=f"Claude API error: {msg}")
 
             async for line in response.aiter_lines():
                 if not line.startswith("data: "):
@@ -205,7 +210,12 @@ async def stream_openai(
         ) as response:
             if response.status_code != 200:
                 body = await response.aread()
-                raise HTTPException(status_code=502, detail=f"Provider error: {body.decode()}")
+                try:
+                    err = json.loads(body.decode())
+                    msg = err.get("error", {}).get("message", body.decode()[:200])
+                except (json.JSONDecodeError, KeyError, AttributeError):
+                    msg = body.decode()[:200]
+                raise HTTPException(status_code=502, detail=f"Provider error: {msg}")
 
             async for line in response.aiter_lines():
                 if not line.startswith("data: "):
@@ -262,7 +272,12 @@ async def stream_gemini(
         ) as response:
             if response.status_code != 200:
                 body = await response.aread()
-                raise HTTPException(status_code=502, detail=f"Gemini error: {body.decode()}")
+                try:
+                    err = json.loads(body.decode())
+                    msg = err.get("error", {}).get("message", body.decode()[:200])
+                except (json.JSONDecodeError, KeyError, AttributeError):
+                    msg = body.decode()[:200]
+                raise HTTPException(status_code=502, detail=f"Gemini error: {msg}")
 
             async for line in response.aiter_lines():
                 if not line.startswith("data: "):

@@ -12,6 +12,7 @@ import ReactMarkdown from "react-markdown";
 import toast from "react-hot-toast";
 import { streamChat, apiFetch } from "../utils/api";
 import { getStoredUser } from "../utils/auth";
+import Logo from "../components/Logo";
 
 interface Message {
   role: "user" | "assistant";
@@ -139,44 +140,47 @@ export default function Chat() {
   return (
     <div className="flex flex-col h-full">
       {/* Header bar */}
-      <div className="h-14 flex items-center justify-between px-4 lg:px-6 border-b border-dark-500/30 bg-dark-800/50 backdrop-blur-sm">
-        <div className="flex items-center gap-3">
+      <div className="min-h-[3.5rem] flex flex-wrap items-center justify-between gap-2 px-3 sm:px-4 lg:px-6 py-2 border-b border-dark-500/30 bg-dark-800/50 backdrop-blur-sm">
+        <div className="flex items-center gap-2 flex-wrap">
           {/* Provider selector */}
           <div className="relative">
             <button
               onClick={() => setShowProviderMenu(!showProviderMenu)}
-              className="flex items-center gap-2 bg-dark-700 border border-dark-500 rounded-lg px-3 py-1.5 text-sm hover:border-dark-400 transition-colors"
+              className="flex items-center gap-1.5 bg-dark-700 border border-dark-500 rounded-lg px-2.5 py-1.5 text-xs sm:text-sm hover:border-dark-400 transition-colors"
             >
               <Sparkles size={14} className={PROVIDER_COLORS[provider] || "text-gray-400"} />
               <span>{PROVIDER_LABELS[provider] || provider}</span>
               <ChevronDown size={14} />
             </button>
             {showProviderMenu && (
-              <div className="absolute top-full mt-1 left-0 bg-dark-700 border border-dark-500 rounded-lg shadow-xl z-50 min-w-[180px]">
-                {providers.map((p) => (
-                  <button
-                    key={p.id}
-                    onClick={() => {
-                      if (p.available) {
-                        setProvider(p.id);
-                        setShowProviderMenu(false);
-                      }
-                    }}
-                    disabled={!p.available}
-                    className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 ${
-                      p.available
-                        ? "hover:bg-dark-600 text-white"
-                        : "text-gray-500 cursor-not-allowed"
-                    } ${p.id === provider ? "bg-dark-600" : ""}`}
-                  >
-                    <Sparkles size={14} className={PROVIDER_COLORS[p.id] || "text-gray-400"} />
-                    {PROVIDER_LABELS[p.id] || p.id}
-                    {!p.available && (
-                      <span className="ml-auto text-xs text-gray-500">upgrade</span>
-                    )}
-                  </button>
-                ))}
-              </div>
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setShowProviderMenu(false)} />
+                <div className="absolute top-full mt-1 left-0 bg-dark-700 border border-dark-500 rounded-lg shadow-xl z-50 min-w-[180px]">
+                  {providers.map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => {
+                        if (p.available) {
+                          setProvider(p.id);
+                          setShowProviderMenu(false);
+                        }
+                      }}
+                      disabled={!p.available}
+                      className={`w-full text-left px-4 py-2.5 text-sm flex items-center gap-2 ${
+                        p.available
+                          ? "hover:bg-dark-600 text-white"
+                          : "text-gray-500 cursor-not-allowed"
+                      } ${p.id === provider ? "bg-dark-600" : ""}`}
+                    >
+                      <Sparkles size={14} className={PROVIDER_COLORS[p.id] || "text-gray-400"} />
+                      {PROVIDER_LABELS[p.id] || p.id}
+                      {!p.available && (
+                        <span className="ml-auto text-xs text-gray-500">upgrade</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </>
             )}
           </div>
 
@@ -185,7 +189,7 @@ export default function Chat() {
             <select
               value={researchMode || ""}
               onChange={(e) => setResearchMode(e.target.value || null)}
-              className="bg-dark-700 border border-dark-500 rounded-lg px-3 py-1.5 text-sm text-gray-300 focus:outline-none"
+              className="bg-dark-700 border border-dark-500 rounded-lg px-2 py-1.5 text-xs sm:text-sm text-gray-300 focus:outline-none max-w-[140px] sm:max-w-none"
             >
               <option value="">General chat</option>
               {researchModes.map((mode) => (
@@ -197,19 +201,17 @@ export default function Chat() {
           )}
         </div>
 
-        <div className="text-xs text-gray-500">
-          {user?.tokens_used_today?.toLocaleString() || 0} tokens used today
+        <div className="text-xs text-gray-500 hidden sm:block">
+          {user?.tokens_used_today?.toLocaleString() || 0} tokens today
         </div>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 lg:px-6 py-4 space-y-4">
+      <div className="flex-1 overflow-y-auto px-3 sm:px-4 lg:px-6 py-4 space-y-4">
         {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-center">
-            <div className="text-6xl font-bold mb-4">
-              <span className="text-brand-orange">i</span>
-              <span className="text-brand-blue">K</span>
-              <span className="text-gray-600">opilot</span>
+          <div className="flex flex-col items-center justify-center h-full text-center px-4">
+            <div className="mb-4">
+              <Logo size="xl" />
             </div>
             <p className="text-gray-400 max-w-md">
               Your AI research assistant. Ask about methodology, analyze literature,
@@ -242,7 +244,7 @@ export default function Chat() {
               </div>
             )}
             <div
-              className={`max-w-[80%] rounded-xl px-4 py-3 ${
+              className={`max-w-[85%] sm:max-w-[80%] rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 ${
                 msg.role === "user"
                   ? "bg-brand-orange/10 border border-brand-orange/20 text-white"
                   : "bg-dark-700/50 border border-dark-500/20 text-gray-200"
@@ -277,8 +279,8 @@ export default function Chat() {
       </div>
 
       {/* Input */}
-      <div className="border-t border-dark-500/30 bg-dark-800/50 p-4 lg:px-6">
-        <div className="flex items-end gap-3 max-w-4xl mx-auto">
+      <div className="border-t border-dark-500/30 bg-dark-800/50 p-3 sm:p-4 lg:px-6">
+        <div className="flex items-end gap-2 sm:gap-3 max-w-4xl mx-auto">
           <textarea
             ref={inputRef}
             value={input}
@@ -286,13 +288,13 @@ export default function Chat() {
             onKeyDown={handleKeyDown}
             placeholder="Ask a research question..."
             rows={1}
-            className="flex-1 bg-dark-700 border border-dark-500 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-brand-blue focus:outline-none resize-none max-h-36"
-            style={{ minHeight: "48px" }}
+            className="flex-1 bg-dark-700 border border-dark-500 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base text-white placeholder-gray-500 focus:border-brand-blue focus:outline-none resize-none max-h-36"
+            style={{ minHeight: "44px" }}
           />
           <button
             onClick={handleSend}
             disabled={!input.trim() || streaming}
-            className="bg-brand-orange hover:bg-orange-600 text-white p-3 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-brand-orange hover:bg-orange-600 text-white p-2.5 sm:p-3 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
           >
             <Send size={18} />
           </button>

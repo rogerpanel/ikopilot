@@ -2,6 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Mobile-friendly defaults */
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Safe area padding for notched devices */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Prevent zoom on input focus (iOS) */
+input, textarea, select {
+  font-size: 16px;
+}
+@media (min-width: 640px) {
+  input, textarea, select {
+    font-size: inherit;
+  }
+}
+
+/* Touch-friendly tap targets */
+button, a, [role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+button.inline-btn, a.inline-link {
+  min-height: auto;
+  min-width: auto;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

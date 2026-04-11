@@ -4,6 +4,7 @@ import { UserPlus } from "lucide-react";
 import toast from "react-hot-toast";
 import { apiPost } from "../utils/api";
 import { saveAuth } from "../utils/auth";
+import Logo from "../components/Logo";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -42,10 +43,8 @@ export default function Register() {
     <div className="min-h-screen bg-dark-900 flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2">
-            <span className="text-brand-orange">i</span>
-            <span className="text-brand-blue">K</span>
-            <span className="text-white">opilot</span>
+          <h1 className="mb-2">
+            <Logo size="lg" />
           </h1>
           <p className="text-gray-400">Start your 7-day free trial</p>
         </div>

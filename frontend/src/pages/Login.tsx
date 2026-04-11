@@ -4,6 +4,7 @@ import { LogIn } from "lucide-react";
 import toast from "react-hot-toast";
 import { apiPost } from "../utils/api";
 import { saveAuth } from "../utils/auth";
+import Logo from "../components/Logo";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -31,10 +32,8 @@ export default function Login() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2">
-            <span className="text-brand-orange">i</span>
-            <span className="text-brand-blue">K</span>
-            <span className="text-white">opilot</span>
+          <h1 className="mb-2">
+            <Logo size="lg" />
           </h1>
           <p className="text-gray-400">AI Research Assistant for Graduate Students</p>
         </div>
