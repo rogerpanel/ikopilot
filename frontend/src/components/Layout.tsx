@@ -15,6 +15,7 @@ import {
   LayoutDashboard,
   Search,
   GraduationCap,
+  FileStack,
 } from "lucide-react";
 import { clearAuth, getStoredUser, isAdmin } from "../utils/auth";
 import Logo from "./Logo";
@@ -38,6 +39,8 @@ export default function Layout() {
     { to: "/framework", label: "iKo Framework", icon: LayoutDashboard },
     { to: "/discover", label: "iKo Discover", icon: Search },
     { to: "/defense", label: "iKo Defense", icon: GraduationCap },
+    { to: "/advisor", label: "iKo Advisor", icon: GraduationCap },
+    { to: "/doc-handler", label: "iKo Doc-Handler", icon: FileStack },
     { to: "/projects", label: "iKo Projects", icon: FolderKanban },
     { to: "/billing", label: "Billing", icon: CreditCard },
     { to: "/profile", label: "Profile", icon: User },

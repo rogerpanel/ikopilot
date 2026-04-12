@@ -16,6 +16,8 @@ import Humanizer from "./pages/Humanizer";
 import Framework from "./pages/Framework";
 import Discover from "./pages/Discover";
 import Defense from "./pages/Defense";
+import Advisor from "./pages/Advisor";
+import DocHandler from "./pages/DocHandler";
 import Layout from "./components/Layout";
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -70,6 +72,8 @@ export default function App() {
           <Route path="framework" element={<Framework />} />
           <Route path="discover" element={<Discover />} />
           <Route path="defense" element={<Defense />} />
+          <Route path="advisor" element={<Advisor />} />
+          <Route path="doc-handler" element={<DocHandler />} />
           <Route
             path="supervisor"
             element={
