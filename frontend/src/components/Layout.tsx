@@ -8,6 +8,8 @@ import {
   LogOut,
   Menu,
   X,
+  Users,
+  CreditCard,
 } from "lucide-react";
 import { clearAuth, getStoredUser, isAdmin } from "../utils/auth";
 import Logo from "./Logo";
@@ -22,10 +24,16 @@ export default function Layout() {
     navigate("/login");
   };
 
+  const isSupervisor = user?.role === "admin" || user?.role === "supervisor";
+
   const navItems = [
     { to: "/chat", label: "Chat", icon: MessageSquare },
     { to: "/projects", label: "Projects", icon: FolderKanban },
+    { to: "/billing", label: "Billing", icon: CreditCard },
     { to: "/profile", label: "Profile", icon: User },
+    ...(isSupervisor
+      ? [{ to: "/supervisor", label: "Mentees", icon: Users }]
+      : []),
     ...(isAdmin()
       ? [{ to: "/admin", label: "Admin", icon: Shield }]
       : []),

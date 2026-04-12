@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { isAuthenticated, isAdmin } from "./utils/auth";
+import { getStoredUser } from "./utils/auth";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -8,6 +9,8 @@ import Chat from "./pages/Chat";
 import Projects from "./pages/Projects";
 import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
+import Supervisor from "./pages/Supervisor";
+import Billing from "./pages/Billing";
 import Layout from "./components/Layout";
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -20,6 +23,12 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
   ) : (
     <Navigate to="/chat" />
   );
+}
+
+function SupervisorRoute({ children }: { children: React.ReactNode }) {
+  const user = getStoredUser();
+  const allowed = user?.role === "admin" || user?.role === "supervisor";
+  return isAuthenticated() && allowed ? <>{children}</> : <Navigate to="/chat" />;
 }
 
 export default function App() {
@@ -40,16 +49,6 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route
-          path="/app"
-          element={
-            <PrivateRoute>
-              <Layout />
-            </PrivateRoute>
-          }
-        >
-          <Route index element={<Navigate to="/chat" />} />
-        </Route>
-        <Route
           element={
             <PrivateRoute>
               <Layout />
@@ -60,6 +59,15 @@ export default function App() {
           <Route path="chat/:conversationId" element={<Chat />} />
           <Route path="projects" element={<Projects />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="billing" element={<Billing />} />
+          <Route
+            path="supervisor"
+            element={
+              <SupervisorRoute>
+                <Supervisor />
+              </SupervisorRoute>
+            }
+          />
           <Route
             path="admin"
             element={

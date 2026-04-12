@@ -19,8 +19,14 @@ router = APIRouter(prefix="/api/files", tags=["files"])
 UPLOAD_DIR = Path("/app/uploads")
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
-ALLOWED_EXTENSIONS = {".pdf", ".csv", ".txt", ".docx", ".doc", ".xlsx", ".md", ".tex", ".bib"}
+ALLOWED_EXTENSIONS = {
+    ".pdf", ".csv", ".txt", ".docx", ".doc", ".xlsx", ".md", ".tex", ".bib",
+    ".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp",
+    ".pptx", ".ppt",
+}
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
+IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp"}
+SLIDE_EXTENSIONS = {".pptx", ".ppt"}
 
 
 def _extract_text_from_file(file_path: Path, content_type: str) -> str:
@@ -63,7 +69,66 @@ def _extract_text_from_file(file_path: Path, content_type: str) -> str:
         except Exception:
             return "[Could not extract document text]"
 
+    if suffix in IMAGE_EXTENSIONS:
+        return f"[Image: {file_path.name} — describe what you see in this image if relevant to the research]"
+
+    if suffix in SLIDE_EXTENSIONS:
+        try:
+            from pptx import Presentation
+            prs = Presentation(str(file_path))
+            texts = []
+            for slide in prs.slides:
+                for shape in slide.shapes:
+                    if shape.has_text_frame:
+                        texts.append(shape.text)
+            return "\n".join(texts)[:50000]
+        except ImportError:
+            return "[PPTX content - install python-pptx for text extraction]"
+        except Exception:
+            return "[Could not extract slide text]"
+
     return f"[File: {file_path.name}]"
+
+
+@router.post("/chat-upload")
+async def chat_upload(
+    file: UploadFile = File(...),
+    user: User = Depends(get_current_user),
+):
+    """Upload a file inline during chat (not tied to a project). Returns extracted text."""
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="No file provided")
+
+    ext = Path(file.filename).suffix.lower()
+    if ext not in ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"File type {ext} not allowed. Supported: {', '.join(sorted(ALLOWED_EXTENSIONS))}",
+        )
+
+    content = await file.read()
+    if len(content) > MAX_FILE_SIZE:
+        raise HTTPException(status_code=400, detail="File too large. Maximum 10MB.")
+
+    file_id = str(uuid.uuid4())[:8]
+    safe_name = f"{file_id}_{file.filename.replace(' ', '_')}"
+    user_dir = UPLOAD_DIR / str(user.id) / "chat"
+    user_dir.mkdir(parents=True, exist_ok=True)
+    file_path = user_dir / safe_name
+    file_path.write_bytes(content)
+
+    is_image = ext in IMAGE_EXTENSIONS
+    extracted_text = "" if is_image else _extract_text_from_file(file_path, file.content_type or "")
+
+    return {
+        "id": file_id,
+        "name": file.filename,
+        "size": len(content),
+        "type": ext,
+        "is_image": is_image,
+        "extracted_text": extracted_text[:20000],
+        "path": str(file_path),
+    }
 
 
 @router.post("/upload")

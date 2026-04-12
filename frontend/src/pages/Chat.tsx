@@ -10,8 +10,10 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   BookOpen,
-  Code2,
   FileCode,
+  Paperclip,
+  FileText,
+  Image,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import toast from "react-hot-toast";
@@ -66,6 +68,11 @@ export default function Chat() {
   const [convId, setConvId] = useState<number | null>(
     conversationId ? parseInt(conversationId) : null
   );
+  const [attachedFiles, setAttachedFiles] = useState<
+    { id: string; name: string; type: string; extracted_text: string; is_image: boolean }[]
+  >([]);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const user = getStoredUser();
@@ -119,9 +126,21 @@ export default function Chat() {
     const text = input.trim();
     if (!text || streaming) return;
 
-    const userMsg: Message = { role: "user", content: text };
+    // Build message with file context
+    let fullContent = text;
+    if (attachedFiles.length > 0) {
+      const fileContextParts = attachedFiles.map((f) => {
+        if (f.is_image) return `[Attached image: ${f.name}]`;
+        if (f.extracted_text) return `[Attached file: ${f.name}]\n${f.extracted_text.slice(0, 10000)}`;
+        return `[Attached file: ${f.name}]`;
+      });
+      fullContent = fileContextParts.join("\n\n") + "\n\n" + text;
+    }
+
+    const userMsg: Message = { role: "user", content: fullContent };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
+    setAttachedFiles([]);
     setStreaming(true);
 
     setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
@@ -162,6 +181,34 @@ export default function Chat() {
         });
       }
     );
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const token = localStorage.getItem("ikopilot_token");
+      const res = await fetch("/api/files/chat-upload", {
+        method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData,
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({ detail: "Upload failed" }));
+        throw new Error(body.detail);
+      }
+      const data = await res.json();
+      setAttachedFiles((prev) => [...prev, data]);
+      toast.success(`Attached ${file.name}`);
+    } catch (err: any) {
+      toast.error(err.message || "Upload failed");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -460,13 +507,59 @@ export default function Chat() {
 
         {/* Input */}
         <div className="border-t border-dark-500/30 bg-dark-800/50 p-3 sm:p-4 lg:px-6 safe-bottom">
+          {/* Attached files preview */}
+          {attachedFiles.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-2 max-w-4xl mx-auto">
+              {attachedFiles.map((f) => (
+                <div
+                  key={f.id}
+                  className="flex items-center gap-1.5 bg-dark-700 border border-dark-500/50 rounded-lg px-2.5 py-1.5 text-xs text-gray-300"
+                >
+                  {f.is_image ? (
+                    <Image size={12} className="text-green-400" />
+                  ) : (
+                    <FileText size={12} className="text-brand-blue" />
+                  )}
+                  <span className="max-w-[120px] truncate">{f.name}</span>
+                  <button
+                    onClick={() => setAttachedFiles((prev) => prev.filter((x) => x.id !== f.id))}
+                    className="text-gray-500 hover:text-red-400 inline-btn"
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
           <div className="flex items-end gap-2 sm:gap-3 max-w-4xl mx-auto">
+            {/* File attach button */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              onChange={handleFileUpload}
+              accept=".pdf,.csv,.txt,.docx,.doc,.xlsx,.md,.tex,.bib,.png,.jpg,.jpeg,.gif,.svg,.webp,.pptx,.ppt"
+              className="hidden"
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="text-gray-400 hover:text-white p-2.5 sm:p-3 rounded-xl hover:bg-dark-700 transition-colors disabled:opacity-50 flex-shrink-0"
+              title="Attach file (PDF, DOCX, image, slides, LaTeX)"
+            >
+              {uploading ? (
+                <Loader2 size={18} className="animate-spin" />
+              ) : (
+                <Paperclip size={18} />
+              )}
+            </button>
+
             <textarea
               ref={inputRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask a research question..."
+              placeholder={attachedFiles.length > 0 ? "Ask about the attached file..." : "Ask a research question..."}
               rows={1}
               className="flex-1 bg-dark-700 border border-dark-500 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base text-white placeholder-gray-500 focus:border-brand-blue focus:outline-none resize-none max-h-36"
               style={{ minHeight: "44px" }}
