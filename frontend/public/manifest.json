@@ -1,0 +1,14 @@
+{
+  "name": "iKopilot — Your Intelligent Research Co-Pilot",
+  "short_name": "iKopilot",
+  "description": "AI-powered research assistant for university students",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0e1a",
+  "theme_color": "#0a0e1a",
+  "orientation": "any",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ],
+  "categories": ["education", "productivity"]
+}

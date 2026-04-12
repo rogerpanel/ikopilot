@@ -16,6 +16,18 @@ import {
   Search,
   FileCode,
   Quote,
+  MessageSquare,
+  Layers,
+  Edit3,
+  Frame,
+  Compass,
+  Shield,
+  UserCheck,
+  FileBox,
+  UserPlus,
+  Rocket,
+  Wand2,
+  Briefcase,
 } from "lucide-react";
 import Logo from "../components/Logo";
 import LLMComparison from "../components/LLMComparison";
