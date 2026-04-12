@@ -1,6 +1,7 @@
 """iKopilot FastAPI application — multi-LLM research assistant for grad students."""
 
 from contextlib import asynccontextmanager
+import asyncio
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,6 +19,7 @@ from history import router as history_router
 from scholar import router as scholar_router
 from orchestrator import router as orchestrator_router
 from humanizer import router as humanizer_router
+from cleanup import router as cleanup_router, schedule_cleanup
 
 from sqlalchemy import select
 
@@ -52,7 +54,10 @@ async def seed_admin():
 async def lifespan(app: FastAPI):
     await init_db()
     await seed_admin()
+    # Start background cleanup scheduler (30-day data retention)
+    cleanup_task = asyncio.create_task(schedule_cleanup())
     yield
+    cleanup_task.cancel()
 
 
 app = FastAPI(
@@ -71,6 +76,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+# Request-scoped user isolation header
+@app.middleware("http")
+async def add_security_headers(request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Cache-Control"] = "no-store, private"
+    return response
+
+
 # Routers
 app.include_router(auth_router)
 app.include_router(chat_router)
@@ -83,6 +99,7 @@ app.include_router(history_router)
 app.include_router(scholar_router)
 app.include_router(orchestrator_router)
 app.include_router(humanizer_router)
+app.include_router(cleanup_router)
 
 
 @app.get("/api/health")

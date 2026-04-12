@@ -47,7 +47,10 @@ async def list_projects(
     output = []
     for p in projects:
         conv_count = await db.execute(
-            select(func.count(Conversation.id)).where(Conversation.project_id == p.id)
+            select(func.count(Conversation.id)).where(
+                Conversation.project_id == p.id,
+                Conversation.user_id == user.id,
+            )
         )
         output.append({
             "id": p.id,

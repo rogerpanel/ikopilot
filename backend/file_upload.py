@@ -195,7 +195,7 @@ async def upload_file(
 
     await db.execute(
         update(Project)
-        .where(Project.id == project_id)
+        .where(Project.id == project_id, Project.user_id == user.id)
         .values(context_files_json=files_list)
     )
     await db.commit()
@@ -254,7 +254,7 @@ async def delete_file(
     files_list = [f for f in files_list if f["id"] != file_id]
     await db.execute(
         update(Project)
-        .where(Project.id == project_id)
+        .where(Project.id == project_id, Project.user_id == user.id)
         .values(context_files_json=files_list)
     )
     await db.commit()

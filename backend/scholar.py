@@ -269,7 +269,7 @@ async def add_citation(
 
     await db.execute(
         update(Project)
-        .where(Project.id == req.project_id)
+        .where(Project.id == req.project_id, Project.user_id == user.id)
         .values(context_files_json=files_data)
     )
     await db.commit()
@@ -322,7 +322,7 @@ async def remove_citation(
 
     await db.execute(
         update(Project)
-        .where(Project.id == project_id)
+        .where(Project.id == project_id, Project.user_id == user.id)
         .values(context_files_json=files_data)
     )
     await db.commit()
