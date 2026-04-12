@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Target,
   BookOpen,
@@ -16,7 +16,10 @@ import {
   ArrowLeft,
   Lock,
   Zap,
+  Paperclip,
+  Upload,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import toast from "react-hot-toast";
 import { apiFetch, apiPost } from "../utils/api";
@@ -66,8 +69,35 @@ const LLM_LABELS: Record<string, { name: string; color: string }> = {
   deepseek: { name: "DeepSeek", color: "text-purple-400" },
 };
 
+const STAGE_DECISIONS: Record<
+  string,
+  { id: string; label: string; action: "proceed" | "revise" | "redirect" }[]
+> = {
+  topic: [
+    { id: "proceed", label: "Proceed as is", action: "proceed" },
+    { id: "narrow", label: "Narrow the question further", action: "revise" },
+    { id: "change", label: "Change direction entirely", action: "redirect" },
+  ],
+  methodology: [
+    { id: "approve", label: "Approve methodology", action: "proceed" },
+    { id: "modify", label: "Modify sampling/instruments", action: "revise" },
+    { id: "different", label: "Try different approach", action: "redirect" },
+  ],
+  data_analysis: [
+    { id: "proceed", label: "Proceed to discussion", action: "proceed" },
+    { id: "additional", label: "Run additional tests", action: "revise" },
+    { id: "upload_data", label: "Upload actual data for re-analysis", action: "redirect" },
+  ],
+  conclusion: [
+    { id: "proceed", label: "Proceed to references", action: "proceed" },
+    { id: "revise_prev", label: "Revise a previous chapter", action: "revise" },
+    { id: "humanize", label: "Run humanizer on completed sections", action: "redirect" },
+  ],
+};
+
 export default function AllInOne() {
   const user = getStoredUser();
+  const navigate = useNavigate();
   const isPremium = ["pro", "lab_group"].includes(user?.subscription_tier || "");
   const [stages, setStages] = useState<StageConfig[]>([]);
   const [session, setSession] = useState<Session | null>(null);
@@ -77,6 +107,9 @@ export default function AllInOne() {
   const [stageOutput, setStageOutput] = useState<string>("");
   const [processing, setProcessing] = useState(false);
   const [showOutput, setShowOutput] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<{ name: string; extracted_text: string } | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     apiFetch("/api/orchestrator/stages").then(setStages).catch(() => {});
@@ -91,6 +124,7 @@ export default function AllInOne() {
       setStageOutput("");
       setStageInputs({});
       setShowOutput(false);
+      setUploadedFile(null);
     } catch (err: any) {
       toast.error(err.message);
     }
@@ -130,10 +164,15 @@ export default function AllInOne() {
     setShowOutput(true);
 
     try {
+      const inputs = { ...stageInputs };
+      if (uploadedFile?.extracted_text) {
+        inputs._attached_file_text = uploadedFile.extracted_text;
+      }
+
       const result = await apiPost(`/api/orchestrator/sessions/${session.id}/execute`, {
         session_id: session.id,
         stage_id: stage.id,
-        inputs: stageInputs,
+        inputs,
       });
 
       setStageOutput(result.output);
@@ -153,6 +192,7 @@ export default function AllInOne() {
       setStageInputs({});
       setStageOutput("");
       setShowOutput(false);
+      setUploadedFile(null);
     }
   };
 
@@ -187,6 +227,42 @@ export default function AllInOne() {
       toast.success("Document exported");
     } catch {
       toast.error("Export failed");
+    }
+  };
+
+  const handleFileUpload = async (file: File) => {
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const token = localStorage.getItem("ikopilot_token");
+      const res = await fetch("/api/files/chat-upload", {
+        method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData,
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({ detail: "Upload failed" }));
+        throw new Error(body.detail);
+      }
+      const data = await res.json();
+      setUploadedFile({ name: data.name || file.name, extracted_text: data.extracted_text || "" });
+      toast.success(`Attached ${file.name}`);
+    } catch (err: any) {
+      toast.error(err.message || "Upload failed");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleDecision = (action: "proceed" | "revise" | "redirect") => {
+    if (action === "proceed") {
+      goToNextStage();
+    } else {
+      // revise or redirect — re-open input form for current stage
+      setShowOutput(false);
+      setStageInputs({});
     }
   };
 
@@ -406,6 +482,32 @@ export default function AllInOne() {
                 </div>
               </div>
 
+              {/* Decision checkpoint */}
+              {STAGE_DECISIONS[currentStage?.id] && (
+                <div className="bg-dark-800 border border-dark-500/30 rounded-xl p-5 mb-4">
+                  <p className="text-sm font-medium text-gray-300 mb-3">
+                    How would you like to proceed?
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {STAGE_DECISIONS[currentStage.id].map((decision) => (
+                      <button
+                        key={decision.id}
+                        onClick={() => handleDecision(decision.action)}
+                        className={`text-sm px-4 py-2 rounded-lg border transition-colors ${
+                          decision.action === "proceed"
+                            ? "bg-brand-orange/10 border-brand-orange/40 text-brand-orange hover:bg-brand-orange/20"
+                            : decision.action === "revise"
+                            ? "bg-blue-500/10 border-blue-500/40 text-blue-400 hover:bg-blue-500/20"
+                            : "bg-purple-500/10 border-purple-500/40 text-purple-400 hover:bg-purple-500/20"
+                        }`}
+                      >
+                        {decision.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="flex items-center gap-3">
                 {activeStageIdx > 0 && (
                   <button
@@ -426,13 +528,25 @@ export default function AllInOne() {
                   </button>
                 )}
                 {activeStageIdx === stages.length - 1 && (
-                  <button
-                    onClick={handleExport}
-                    className="flex items-center gap-1 text-sm bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg"
-                  >
-                    <Download size={14} />
-                    Export Complete Document
-                  </button>
+                  <>
+                    <button
+                      onClick={handleExport}
+                      className="flex items-center gap-1 text-sm bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg"
+                    >
+                      <Download size={14} />
+                      Export Complete Document
+                    </button>
+                    <button
+                      onClick={() => {
+                        sessionStorage.setItem("iko_writer_text", stageOutput);
+                        navigate("/humanizer");
+                      }}
+                      className="flex items-center gap-1 text-sm bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg"
+                    >
+                      <PenTool size={14} />
+                      Open in iKo Writer
+                    </button>
+                  </>
                 )}
                 <button
                   onClick={() => {
@@ -448,6 +562,22 @@ export default function AllInOne() {
           ) : (
             /* Input form */
             <div className="max-w-2xl">
+              {/* Uploaded file chip */}
+              {uploadedFile && (
+                <div className="mb-4 flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 bg-dark-700 border border-dark-500 rounded-full px-3 py-1 text-xs text-gray-300">
+                    <Paperclip size={12} className="text-brand-orange" />
+                    {uploadedFile.name}
+                    <button
+                      onClick={() => setUploadedFile(null)}
+                      className="ml-1 text-gray-500 hover:text-white"
+                    >
+                      &times;
+                    </button>
+                  </span>
+                </div>
+              )}
+
               <div className="space-y-4">
                 {currentStage?.user_inputs.map((field) => (
                   <div key={field.id}>
@@ -502,6 +632,37 @@ export default function AllInOne() {
                     )}
                   </div>
                 ))}
+
+                {/* File upload */}
+                <div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleFileUpload(file);
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                    className="flex items-center gap-2 text-sm text-gray-400 hover:text-white border border-dashed border-dark-500 hover:border-dark-400 rounded-lg px-4 py-2.5 transition-colors disabled:opacity-50"
+                  >
+                    {uploading ? (
+                      <>
+                        <Loader2 size={14} className="animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Upload size={14} />
+                        Attach a file (PDF, DOCX, TXT)
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
 
               <div className="flex items-center gap-3 mt-6">

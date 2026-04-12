@@ -11,6 +11,7 @@ import {
   Users,
   CreditCard,
   Sparkles,
+  PenTool,
 } from "lucide-react";
 import { clearAuth, getStoredUser, isAdmin } from "../utils/auth";
 import Logo from "./Logo";
@@ -30,6 +31,7 @@ export default function Layout() {
   const navItems = [
     { to: "/chat", label: "Chat", icon: MessageSquare },
     { to: "/all-in-one", label: "iKo All-in-One", icon: Sparkles },
+    { to: "/humanizer", label: "iKo Writer", icon: PenTool },
     { to: "/projects", label: "Projects", icon: FolderKanban },
     { to: "/billing", label: "Billing", icon: CreditCard },
     { to: "/profile", label: "Profile", icon: User },

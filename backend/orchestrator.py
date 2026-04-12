@@ -235,6 +235,45 @@ PIPELINE_STAGES = [
 ]
 
 
+# ---------- Smart LLM Routing ----------
+
+STEM_FIELDS = {"computer science", "engineering", "physics", "mathematics", "chemistry",
+               "biology", "data science", "statistics", "information technology", "ai",
+               "machine learning", "electrical", "mechanical", "civil", "robotics"}
+HEALTH_FIELDS = {"medicine", "public health", "nursing", "epidemiology", "pharmacy",
+                 "biomedical", "clinical", "health informatics", "dentistry", "veterinary"}
+HUMANITIES_FIELDS = {"literature", "philosophy", "history", "linguistics", "theology",
+                     "cultural studies", "art", "music", "classics", "languages"}
+
+
+def _select_llm_for_stage(stage_id: str, discipline: str, approach: str) -> str:
+    """Select the best LLM based on research field, approach, and stage."""
+    disc_lower = discipline.lower().strip()
+    is_stem = any(f in disc_lower for f in STEM_FIELDS)
+    is_health = any(f in disc_lower for f in HEALTH_FIELDS)
+    is_humanities = any(f in disc_lower for f in HUMANITIES_FIELDS)
+    is_quantitative = approach.lower() in ("quantitative", "experimental", "design science", "survey-based")
+
+    if stage_id in ("topic", "discussion", "conclusion", "humanize"):
+        return "claude"  # Claude best for academic writing and nuance
+
+    if stage_id == "literature":
+        return "claude"  # Claude best for synthesis
+
+    if stage_id == "methodology":
+        if is_stem and is_quantitative:
+            return "deepseek"  # Good at method-specific code/formulas
+        return "claude"
+
+    if stage_id == "data_analysis":
+        return "deepseek"  # Best for code generation (Python/R/SPSS)
+
+    if stage_id == "references":
+        return "deepseek"  # Best for structured formatting tasks
+
+    return "claude"  # Default
+
+
 # ---------- Schemas ----------
 
 class StartSessionRequest(BaseModel):
@@ -246,6 +285,7 @@ class StageInputRequest(BaseModel):
     stage_id: str
     inputs: dict
     user_message: str = ""
+    uploaded_file_context: str = ""  # Text extracted from uploaded files
 
 
 class SessionOut(BaseModel):
@@ -270,6 +310,8 @@ class OrchestratorSession:
         self.stages_completed: list[str] = []
         self.stage_outputs: dict[str, str] = {}
         self.stage_inputs: dict[str, dict] = {}
+        self.discipline: str = ""
+        self.approach: str = ""
         self.created_at = datetime.now(timezone.utc)
 
     def to_dict(self):
@@ -279,6 +321,8 @@ class OrchestratorSession:
             "current_stage": self.current_stage,
             "stages_completed": self.stages_completed,
             "stage_outputs": self.stage_outputs,
+            "discipline": self.discipline,
+            "approach": self.approach,
             "created_at": self.created_at.isoformat(),
         }
 
@@ -388,12 +432,21 @@ async def execute_stage(
 
     user_message = "\n".join(user_parts) if user_parts else "Please proceed with this stage."
 
-    # Update title from first stage
-    if req.stage_id == "topic" and req.inputs.get("topic"):
-        session.title = req.inputs["topic"][:100]
+    # Append file context if provided
+    if req.uploaded_file_context:
+        user_parts.append(f"\n--- Attached file content ---\n{req.uploaded_file_context[:15000]}")
 
-    # Select LLM
-    llm = stage["llm"]
+    # Update session metadata from first stage
+    if req.stage_id == "topic":
+        if req.inputs.get("topic"):
+            session.title = req.inputs["topic"][:100]
+        if req.inputs.get("discipline"):
+            session.discipline = req.inputs["discipline"]
+    if req.stage_id == "methodology" and req.inputs.get("approach"):
+        session.approach = req.inputs.get("approach", "")
+
+    # Smart LLM routing based on research field and approach
+    llm = _select_llm_for_stage(req.stage_id, session.discipline, session.approach)
     api_key = get_api_key(llm)
 
     # Call LLM (non-streaming for orchestrator — stores full output)
