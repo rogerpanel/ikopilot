@@ -18,6 +18,7 @@ import {
   Quote,
 } from "lucide-react";
 import Logo from "../components/Logo";
+import LLMComparison from "../components/LLMComparison";
 import { isAuthenticated } from "../utils/auth";
 
 const FEATURES = [
@@ -157,9 +158,9 @@ export default function Landing() {
       {/* Hero */}
       <section className="text-center px-6 pt-16 pb-20 max-w-4xl mx-auto">
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-          Your AI-Powered{" "}
+          Your Intelligent{" "}
           <span className="text-brand-orange">Research</span>{" "}
-          <span className="text-brand-blue">Assistant</span>
+          <span className="text-brand-blue">Co-Pilot</span>
         </h1>
         <p className="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto mb-8">
           Literature reviews, methodology advice, data analysis, academic
@@ -227,8 +228,19 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Pricing */}
+      {/* AI Models Comparison */}
       <section className="px-6 py-16 max-w-5xl mx-auto">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">
+          4 AI Models, Each with Unique Strengths
+        </h2>
+        <p className="text-gray-400 text-center mb-10 max-w-xl mx-auto">
+          Choose the right model for each task — or let iKopilot guide you
+        </p>
+        <LLMComparison />
+      </section>
+
+      {/* Pricing */}
+      <section className="px-6 py-16 bg-dark-800/30 max-w-5xl mx-auto">
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">
           Simple Pricing
         </h2>
@@ -328,7 +340,7 @@ export default function Landing() {
           <div className="flex items-center gap-2">
             <Logo size="sm" />
             <span className="text-sm text-gray-500">
-              AI Research Assistant for University Students
+              Your Intelligent Research Co-Pilot
             </span>
           </div>
           <p className="text-xs text-gray-600">

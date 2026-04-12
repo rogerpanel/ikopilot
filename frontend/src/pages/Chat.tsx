@@ -426,7 +426,7 @@ export default function Chat() {
                 <Logo size="xl" />
               </div>
               <p className="text-gray-400 max-w-md mb-6">
-                Your AI research assistant. Ask about methodology, analyze
+                Your Intelligent Research Co-Pilot. Ask about methodology, analyze
                 literature, get writing feedback, or explore statistical results.
               </p>
               {researchModes.length > 0 && (
