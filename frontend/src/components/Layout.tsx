@@ -19,6 +19,7 @@ import {
   ChevronLeft,
   ChevronRight,
   User,
+  HelpCircle,
 } from "lucide-react";
 import { clearAuth, getStoredUser, isAdmin } from "../utils/auth";
 import Logo from "./Logo";
@@ -83,6 +84,7 @@ export default function Layout() {
       ? [{ to: "/admin", label: "Admin", icon: Shield }]
       : []),
     { to: "/billing", label: "Billing", icon: CreditCard },
+    { to: "/docs", label: "User Guide", icon: HelpCircle },
   ];
 
   const renderNavLink = (item: NavItem) => (

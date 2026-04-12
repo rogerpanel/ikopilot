@@ -18,6 +18,7 @@ import Discover from "./pages/Discover";
 import Defense from "./pages/Defense";
 import Advisor from "./pages/Advisor";
 import DocHandler from "./pages/DocHandler";
+import Docs from "./pages/Docs";
 import Layout from "./components/Layout";
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -74,6 +75,7 @@ export default function App() {
           <Route path="defense" element={<Defense />} />
           <Route path="advisor" element={<Advisor />} />
           <Route path="doc-handler" element={<DocHandler />} />
+          <Route path="docs" element={<Docs />} />
           <Route
             path="supervisor"
             element={
