@@ -35,46 +35,67 @@ import { isAuthenticated } from "../utils/auth";
 
 const FEATURES = [
   {
-    icon: Sparkles,
-    title: "4 AI Models, One Interface",
+    icon: MessageSquare,
+    title: "Multi-LLM Chat",
     description:
-      "Claude, GPT-4o, Gemini, and DeepSeek — switch models mid-conversation for the best results.",
+      "4 AI models in one interface with research modes, file upload, and LaTeX output",
     color: "text-brand-orange",
   },
   {
-    icon: BookOpen,
-    title: "8 Research Modes",
+    icon: Layers,
+    title: "iKo All-in-One",
     description:
-      "Guided workflows for literature reviews, methodology, data analysis, writing critique, and more.",
+      "Complete thesis pipeline — from topic to polished document in 8 guided stages",
     color: "text-blue-400",
+  },
+  {
+    icon: Edit3,
+    title: "iKo Writer",
+    description:
+      "Writefull-style AI text polisher — removes AI patterns, fixes grammar, formats equations",
+    color: "text-green-400",
+  },
+  {
+    icon: Frame,
+    title: "iKo Framework",
+    description:
+      "Generate TikZ, Mermaid, Draw.io diagrams and DALL-E scientific illustrations",
+    color: "text-yellow-400",
+  },
+  {
+    icon: Compass,
+    title: "iKo Discover",
+    description:
+      "Auto-gap detector, debate mode, and citation graph for research intelligence",
+    color: "text-purple-400",
+  },
+  {
+    icon: Shield,
+    title: "iKo Defense",
+    description:
+      "Examiner question generator, mock defense sessions, and presentation builder",
+    color: "text-red-400",
+  },
+  {
+    icon: UserCheck,
+    title: "iKo Advisor",
+    description:
+      "AI research supervisor with field-specific guidance across all disciplines",
+    color: "text-cyan-400",
+  },
+  {
+    icon: FileBox,
+    title: "iKo Doc-Handler",
+    description:
+      "PDF tools — convert, merge, split, compress, watermark, protect (like iLovePDF)",
+    color: "text-pink-400",
   },
   {
     icon: Search,
     title: "Paper Search & Citations",
     description:
-      "Search 200M+ papers from OpenAlex, Semantic Scholar, and CrossRef. Auto-generate BibTeX.",
-    color: "text-green-400",
-  },
-  {
-    icon: FileCode,
-    title: "LaTeX Output for Overleaf",
-    description:
-      "Toggle LaTeX mode for thesis-ready output. Upload .tex and .bib files directly.",
-    color: "text-yellow-400",
-  },
-  {
-    icon: GraduationCap,
-    title: "BSc to PhD",
-    description:
-      "Adapts to your level — bachelor projects, master's theses, PhD dissertations, and research papers.",
-    color: "text-purple-400",
-  },
-  {
-    icon: Quote,
-    title: "APA, IEEE, Harvard",
-    description:
-      "Auto-format citations in your preferred style. Export references as BibTeX for your bibliography.",
-    color: "text-pink-400",
+      "Search 200M+ papers, auto-generate BibTeX, format APA/IEEE/Harvard",
+    color: "text-teal-400",
   },
 ];
 
@@ -176,8 +197,8 @@ export default function Landing() {
         </h1>
         <p className="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto mb-8">
           Literature reviews, methodology advice, data analysis, academic
-          writing, thesis outlines, and citation management — powered by Claude,
-          GPT-4o, Gemini, and DeepSeek.
+          writing, thesis defense prep, document tools, and research diagrams —
+          powered by Claude, GPT-4o, Gemini, and DeepSeek.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
@@ -190,6 +211,53 @@ export default function Landing() {
           <p className="text-sm text-gray-500">
             No credit card required · 7-day free trial
           </p>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="px-6 py-16 bg-dark-800/30">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">
+            How It Works
+          </h2>
+          <p className="text-gray-400 text-center mb-10 max-w-xl mx-auto">
+            From sign-up to submission in three simple steps
+          </p>
+          <div className="grid sm:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-12 h-12 rounded-full bg-brand-orange/10 flex items-center justify-center mx-auto mb-4">
+                <UserPlus size={24} className="text-brand-orange" />
+              </div>
+              <h3 className="font-semibold text-white mb-2">
+                1. Sign up &amp; choose your level
+              </h3>
+              <p className="text-sm text-gray-400">
+                BSc, MSc, or PhD — iKopilot adapts to your academic level
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="w-12 h-12 rounded-full bg-brand-blue/10 flex items-center justify-center mx-auto mb-4">
+                <Rocket size={24} className="text-brand-blue" />
+              </div>
+              <h3 className="font-semibold text-white mb-2">
+                2. Start your research
+              </h3>
+              <p className="text-sm text-gray-400">
+                Use guided tools or free-form chat with 4 AI models
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-4">
+                <Wand2 size={24} className="text-green-400" />
+              </div>
+              <h3 className="font-semibold text-white mb-2">
+                3. Polish &amp; export
+              </h3>
+              <p className="text-sm text-gray-400">
+                Humanize your text, generate diagrams, export for submission
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -312,11 +380,11 @@ export default function Landing() {
 
       {/* Who is it for */}
       <section className="px-6 py-16 bg-dark-800/30">
-        <div className="max-w-3xl mx-auto text-center">
+        <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl sm:text-3xl font-bold mb-6">
             Who is iKopilot for?
           </h2>
-          <div className="grid sm:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div>
               <GraduationCap size={32} className="mx-auto text-brand-blue mb-3" />
               <h3 className="font-semibold text-white mb-1">
@@ -340,6 +408,15 @@ export default function Landing() {
               <h3 className="font-semibold text-white mb-1">PhD Researchers</h3>
               <p className="text-sm text-gray-400">
                 Dissertation chapters, publication prep, statistical interpretation, and peer review
+              </p>
+            </div>
+            <div>
+              <Briefcase size={32} className="mx-auto text-green-400 mb-3" />
+              <h3 className="font-semibold text-white mb-1">
+                Researchers &amp; Academics
+              </h3>
+              <p className="text-sm text-gray-400">
+                Journal submissions, peer review preparation, grant proposals
               </p>
             </div>
           </div>
