@@ -20,6 +20,7 @@ from scholar import router as scholar_router
 from orchestrator import router as orchestrator_router
 from humanizer import router as humanizer_router
 from cleanup import router as cleanup_router, schedule_cleanup
+from framework import router as framework_router
 
 from sqlalchemy import select
 
@@ -100,6 +101,7 @@ app.include_router(scholar_router)
 app.include_router(orchestrator_router)
 app.include_router(humanizer_router)
 app.include_router(cleanup_router)
+app.include_router(framework_router)
 
 
 @app.get("/api/health")
