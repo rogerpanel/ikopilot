@@ -11,6 +11,7 @@ import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
 import Supervisor from "./pages/Supervisor";
 import Billing from "./pages/Billing";
+import AllInOne from "./pages/AllInOne";
 import Layout from "./components/Layout";
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -60,6 +61,7 @@ export default function App() {
           <Route path="projects" element={<Projects />} />
           <Route path="profile" element={<Profile />} />
           <Route path="billing" element={<Billing />} />
+          <Route path="all-in-one" element={<AllInOne />} />
           <Route
             path="supervisor"
             element={
