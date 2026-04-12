@@ -13,6 +13,8 @@ import {
   Sparkles,
   PenTool,
   LayoutDashboard,
+  Search,
+  GraduationCap,
 } from "lucide-react";
 import { clearAuth, getStoredUser, isAdmin } from "../utils/auth";
 import Logo from "./Logo";
@@ -34,7 +36,9 @@ export default function Layout() {
     { to: "/all-in-one", label: "iKo All-in-One", icon: Sparkles },
     { to: "/humanizer", label: "iKo Writer", icon: PenTool },
     { to: "/framework", label: "iKo Framework", icon: LayoutDashboard },
-    { to: "/projects", label: "Projects", icon: FolderKanban },
+    { to: "/discover", label: "iKo Discover", icon: Search },
+    { to: "/defense", label: "iKo Defense", icon: GraduationCap },
+    { to: "/projects", label: "iKo Projects", icon: FolderKanban },
     { to: "/billing", label: "Billing", icon: CreditCard },
     { to: "/profile", label: "Profile", icon: User },
     ...(isSupervisor

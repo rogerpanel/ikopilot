@@ -14,6 +14,8 @@ import Billing from "./pages/Billing";
 import AllInOne from "./pages/AllInOne";
 import Humanizer from "./pages/Humanizer";
 import Framework from "./pages/Framework";
+import Discover from "./pages/Discover";
+import Defense from "./pages/Defense";
 import Layout from "./components/Layout";
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -66,6 +68,8 @@ export default function App() {
           <Route path="all-in-one" element={<AllInOne />} />
           <Route path="humanizer" element={<Humanizer />} />
           <Route path="framework" element={<Framework />} />
+          <Route path="discover" element={<Discover />} />
+          <Route path="defense" element={<Defense />} />
           <Route
             path="supervisor"
             element={
