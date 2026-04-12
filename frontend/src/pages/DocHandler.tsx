@@ -331,8 +331,8 @@ export default function DocHandler() {
                 type="number"
                 value={options.dpi || "150"}
                 onChange={(e) => setOption("dpi", e.target.value)}
-                min={72}
-                max={600}
+                min="72"
+                max="600"
                 className="w-full bg-dark-700 border border-dark-500 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:border-brand-blue focus:outline-none"
               />
             </div>
@@ -398,8 +398,8 @@ export default function DocHandler() {
               </label>
               <input
                 type="range"
-                min={5}
-                max={100}
+                min="5"
+                max="100"
                 value={options.opacity || "30"}
                 onChange={(e) => setOption("opacity", e.target.value)}
                 className="w-full accent-brand-orange"

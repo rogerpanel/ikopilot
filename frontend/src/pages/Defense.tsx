@@ -741,9 +741,9 @@ function PresentationBuilder() {
               <Clock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
               <input
                 type="number"
-                min={5}
-                max={60}
-                value={form.time_limit}
+                min="5"
+                max="60"
+                value={form.time_limit.toString()}
                 onChange={(e) => updateField("time_limit", parseInt(e.target.value) || 15)}
                 className="w-full bg-dark-700 border border-dark-500 rounded-lg pl-10 pr-4 py-3 text-white focus:border-brand-blue focus:outline-none"
               />
