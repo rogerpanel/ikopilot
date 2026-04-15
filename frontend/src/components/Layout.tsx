@@ -20,6 +20,7 @@ import {
   ChevronRight,
   User,
   HelpCircle,
+  BookOpenCheck,
 } from "lucide-react";
 import { clearAuth, getStoredUser, isAdmin } from "../utils/auth";
 import Logo from "./Logo";
@@ -56,6 +57,7 @@ export default function Layout() {
         { to: "/chat", label: "Chat", icon: MessageSquare },
         { to: "/all-in-one", label: "iKo All-in-One", icon: Sparkles },
         { to: "/projects", label: "iKo Projects", icon: FolderKanban },
+        { to: "/lit-review", label: "iKo Lit-Review", icon: BookOpenCheck },
       ],
     },
     {

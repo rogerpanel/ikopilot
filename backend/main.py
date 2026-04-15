@@ -25,6 +25,7 @@ from discover import router as discover_router
 from defense import router as defense_router
 from advisor import router as advisor_router
 from dochandler import router as dochandler_router
+from litreview import router as litreview_router
 
 from sqlalchemy import select
 
@@ -110,6 +111,7 @@ app.include_router(discover_router)
 app.include_router(defense_router)
 app.include_router(advisor_router)
 app.include_router(dochandler_router)
+app.include_router(litreview_router)
 
 
 @app.get("/api/health")
