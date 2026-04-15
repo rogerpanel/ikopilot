@@ -3,9 +3,12 @@
 @tailwind utilities;
 
 /* Mobile-friendly defaults */
-html, body, #root {
+#root {
   height: 100%;
-  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+html, body {
+  height: 100%;
   -webkit-tap-highlight-color: transparent;
 }
 

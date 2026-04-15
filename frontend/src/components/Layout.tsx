@@ -112,7 +112,7 @@ export default function Layout() {
   );
 
   return (
-    <div className="flex h-screen bg-dark-900">
+    <div className="flex h-screen bg-dark-900 overflow-hidden">
       {/* Mobile overlay for left sidebar */}
       {sidebarOpen && (
         <div

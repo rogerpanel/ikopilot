@@ -170,27 +170,46 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-dark-900">
       {/* Nav */}
-      <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
-        <Logo size="md" />
-        <div className="flex items-center gap-3">
-          <Link
-            to="/login"
-            className="text-sm text-gray-400 hover:text-white transition-colors px-3 py-2"
-          >
-            Sign in
-          </Link>
-          <Link
-            to="/register"
-            className="text-sm bg-brand-orange hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors"
-          >
-            Start Free Trial
-          </Link>
+      <nav className="sticky top-0 z-50 bg-dark-900/95 backdrop-blur-sm border-b border-dark-500/20">
+        <div className="flex items-center justify-between px-6 py-3 max-w-6xl mx-auto">
+          <Logo size="md" />
+          <div className="hidden md:flex items-center gap-1">
+            {[
+              { href: "#how", label: "How It Works" },
+              { href: "#modes", label: "Research Modes" },
+              { href: "#features", label: "Features" },
+              { href: "#models", label: "AI Models" },
+              { href: "#pricing", label: "Pricing" },
+            ].map((tab) => (
+              <a
+                key={tab.href}
+                href={tab.href}
+                className="text-xs text-gray-400 hover:text-white px-3 py-1.5 rounded-lg hover:bg-dark-700 transition-colors"
+              >
+                {tab.label}
+              </a>
+            ))}
+          </div>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/login"
+              className="text-sm text-gray-400 hover:text-white transition-colors px-3 py-2"
+            >
+              Sign in
+            </Link>
+            <Link
+              to="/register"
+              className="text-sm bg-brand-orange hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              Start Free Trial
+            </Link>
+          </div>
         </div>
       </nav>
 
       {/* Hero */}
       <section className="text-center px-6 pt-16 pb-20 max-w-4xl mx-auto">
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight" style={{ fontFamily: "'Georgia', 'Cambria', serif", fontStyle: "italic", whiteSpace: "nowrap" }}>
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight" style={{ fontFamily: "'Georgia', 'Cambria', serif", fontStyle: "italic" }}>
           Your Intelligent{" "}
           <span className="text-brand-orange">Research</span>{" "}
           <span className="text-brand-blue">Co-Pilot</span>
@@ -215,7 +234,7 @@ export default function Landing() {
       </section>
 
       {/* How It Works */}
-      <section className="px-6 py-16 bg-dark-800/30">
+      <section id="how" className="px-6 py-16 bg-dark-800/30 scroll-mt-16">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">
             How It Works
@@ -262,7 +281,7 @@ export default function Landing() {
       </section>
 
       {/* Research Modes */}
-      <section className="px-6 py-16 max-w-5xl mx-auto">
+      <section id="modes" className="px-6 py-16 max-w-5xl mx-auto scroll-mt-16">
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">
           8 Research Modes
         </h2>
@@ -283,7 +302,7 @@ export default function Landing() {
       </section>
 
       {/* Features */}
-      <section className="px-6 py-16 bg-dark-800/30">
+      <section id="features" className="px-6 py-16 bg-dark-800/30 scroll-mt-16">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">
             Built for Academic Research
@@ -309,7 +328,7 @@ export default function Landing() {
       </section>
 
       {/* AI Models Comparison */}
-      <section className="px-6 py-16 max-w-5xl mx-auto">
+      <section id="models" className="px-6 py-16 max-w-5xl mx-auto scroll-mt-16">
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">
           4 AI Models, Each with Unique Strengths
         </h2>
@@ -320,7 +339,7 @@ export default function Landing() {
       </section>
 
       {/* Pricing */}
-      <section className="px-6 py-16 bg-dark-800/30 max-w-5xl mx-auto">
+      <section id="pricing" className="px-6 py-16 bg-dark-800/30 max-w-5xl mx-auto scroll-mt-16">
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">
           Simple Pricing
         </h2>
