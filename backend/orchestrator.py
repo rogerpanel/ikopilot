@@ -351,12 +351,9 @@ async def start_session(
     user: User = Depends(get_current_user),
 ):
     """Start a new research orchestration session."""
-    tier_info = settings.tier_limits.get(user.subscription_tier.value, {})
-    if user.subscription_tier.value not in ("pro", "lab_group"):
-        raise HTTPException(
-            status_code=403,
-            detail="iKo-All-in-One requires Pro or Lab Group plan.",
-        )
+    # Free during public testing phase — remove this comment and uncomment below for production
+    # if user.subscription_tier.value not in ("pro", "lab_group"):
+    #     raise HTTPException(status_code=403, detail="iKo-All-in-One requires Pro or Lab Group plan.")
 
     session = OrchestratorSession(user.id, req.title)
     _sessions[session.id] = session

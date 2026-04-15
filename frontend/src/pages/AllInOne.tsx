@@ -98,7 +98,7 @@ const STAGE_DECISIONS: Record<
 export default function AllInOne() {
   const user = getStoredUser();
   const navigate = useNavigate();
-  const isPremium = ["pro", "lab_group"].includes(user?.subscription_tier || "");
+  const isPremium = true; // Free during public testing phase
   const [stages, setStages] = useState<StageConfig[]>([]);
   const [session, setSession] = useState<Session | null>(null);
   const [sessions, setSessions] = useState<Session[]>([]);

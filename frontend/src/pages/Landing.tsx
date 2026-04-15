@@ -190,7 +190,7 @@ export default function Landing() {
 
       {/* Hero */}
       <section className="text-center px-6 pt-16 pb-20 max-w-4xl mx-auto">
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight" style={{ fontFamily: "'Georgia', 'Cambria', serif", fontStyle: "italic", whiteSpace: "nowrap" }}>
           Your Intelligent{" "}
           <span className="text-brand-orange">Research</span>{" "}
           <span className="text-brand-blue">Co-Pilot</span>
