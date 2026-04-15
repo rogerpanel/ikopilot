@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from auth import get_current_user
 from database import User
 from llm_proxy import get_api_key, PROVIDER_MODELS
-from orchestrator import _call_anthropic
+from orchestrator import _call_anthropic, _call_openai_compat
 
 router = APIRouter(prefix="/api/advisor", tags=["advisor"])
 
@@ -59,11 +59,13 @@ class ConsultRequest(BaseModel):
     level: str = ""
     context: str = ""
     conversation_history: list[dict] = []
+    provider: str = "claude"
 
 
 class DiagnoseRequest(BaseModel):
     message: str
     field: str = ""
+    provider: str = "claude"
 
 
 FIELD_TIPS = {
@@ -157,9 +159,14 @@ async def consult(req: ConsultRequest, user: User = Depends(get_current_user)):
         user_message += f"Conversation so far:{history_text}\n\n"
     user_message += f"Student's message: {req.message}"
 
-    api_key = get_api_key("claude")
-    model = PROVIDER_MODELS["claude"]
-    raw = await _call_anthropic(ADVISOR_SYSTEM_PROMPT, user_message, api_key, model)
+    provider = req.provider if req.provider in PROVIDER_MODELS else "claude"
+    api_key = get_api_key(provider)
+    model = PROVIDER_MODELS[provider]
+
+    if provider == "claude":
+        raw = await _call_anthropic(ADVISOR_SYSTEM_PROMPT, user_message, api_key, model)
+    else:
+        raw = await _call_openai_compat(ADVISOR_SYSTEM_PROMPT, user_message, api_key, model, provider)
 
     try:
         data = json.loads(raw)
@@ -182,11 +189,14 @@ async def diagnose(req: DiagnoseRequest, user: User = Depends(get_current_user))
         '"quick_tips": ["tip1", "tip2", "tip3"]}'
         f"\n\nField: {req.field}\nProblem: {req.message}"
     )
-    api_key = get_api_key("claude")
-    model = PROVIDER_MODELS["claude"]
-    raw = await _call_anthropic(
-        "You are a research problem diagnostician. Return ONLY valid JSON.", prompt, api_key, model
-    )
+    provider = req.provider if req.provider in PROVIDER_MODELS else "claude"
+    api_key = get_api_key(provider)
+    model = PROVIDER_MODELS[provider]
+
+    if provider == "claude":
+        raw = await _call_anthropic("You are a research problem diagnostician. Return ONLY valid JSON.", prompt, api_key, model)
+    else:
+        raw = await _call_openai_compat("You are a research problem diagnostician. Return ONLY valid JSON.", prompt, api_key, model, provider)
     try:
         return json.loads(raw)
     except json.JSONDecodeError:

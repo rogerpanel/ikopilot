@@ -113,6 +113,7 @@ class HumanizeRequest(BaseModel):
     text: str
     intensity: str = "medium"  # "light", "medium", "heavy"
     focus: str = "all"  # "all", "ai_patterns", "grammar", "flow", "hedging"
+    provider: str = "claude"
 
 
 class HumanizeResponse(BaseModel):
@@ -156,31 +157,78 @@ async def humanize_text(
         focus_instructions.get(req.focus, "")
     )
 
-    api_key = get_api_key("claude")
-    model = PROVIDER_MODELS["claude"]
+    provider = req.provider if req.provider in PROVIDER_MODELS else "claude"
+    api_key = get_api_key(provider)
+    model = PROVIDER_MODELS[provider]
 
-    payload = {
-        "model": model,
-        "max_tokens": 8192,
-        "system": system,
-        "messages": [{"role": "user", "content": f"Please revise this text:\n\n{req.text}"}],
-    }
+    user_content = f"Please revise this text:\n\n{req.text}"
 
-    async with httpx.AsyncClient(timeout=120) as client:
-        res = await client.post(
-            "https://api.anthropic.com/v1/messages",
-            headers={
-                "x-api-key": api_key,
-                "anthropic-version": "2023-06-01",
-                "content-type": "application/json",
-            },
-            json=payload,
-        )
-        if res.status_code != 200:
-            raise HTTPException(status_code=502, detail=f"Humanizer error: {res.text[:200]}")
+    if provider == "claude":
+        payload = {
+            "model": model,
+            "max_tokens": 8192,
+            "system": system,
+            "messages": [{"role": "user", "content": user_content}],
+        }
+        async with httpx.AsyncClient(timeout=120) as client:
+            res = await client.post(
+                "https://api.anthropic.com/v1/messages",
+                headers={
+                    "x-api-key": api_key,
+                    "anthropic-version": "2023-06-01",
+                    "content-type": "application/json",
+                },
+                json=payload,
+            )
+            if res.status_code != 200:
+                raise HTTPException(status_code=502, detail=f"Humanizer error: {res.text[:200]}")
+            data = res.json()
+            full_response = data.get("content", [{}])[0].get("text", "")
+    else:
+        if provider == "deepseek":
+            url = "https://api.deepseek.com/chat/completions"
+        elif provider == "gemini":
+            # Use Gemini REST
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+            payload = {
+                "contents": [{"role": "user", "parts": [{"text": user_content}]}],
+                "systemInstruction": {"parts": [{"text": system}]},
+                "generationConfig": {"maxOutputTokens": 8192},
+            }
+            async with httpx.AsyncClient(timeout=120) as client:
+                res = await client.post(url, params={"key": api_key}, json=payload)
+                if res.status_code != 200:
+                    raise HTTPException(status_code=502, detail=f"Humanizer error: {res.text[:200]}")
+                data = res.json()
+                candidates = data.get("candidates", [])
+                full_response = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "") if candidates else ""
+            # Skip the OpenAI-compat path below
+            url = None
+        else:
+            url = "https://api.openai.com/v1/chat/completions"
 
-        data = res.json()
-        full_response = data.get("content", [{}])[0].get("text", "")
+        if url:  # OpenAI-compatible (GPT-4o, DeepSeek)
+            payload = {
+                "model": model,
+                "messages": [
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": user_content},
+                ],
+                "max_tokens": 8192,
+            }
+            async with httpx.AsyncClient(timeout=120) as client:
+                res = await client.post(
+                    url,
+                    headers={
+                        "Authorization": f"Bearer {api_key}",
+                        "Content-Type": "application/json",
+                    },
+                    json=payload,
+                )
+                if res.status_code != 200:
+                    raise HTTPException(status_code=502, detail=f"Humanizer error: {res.text[:200]}")
+                data = res.json()
+                full_response = data.get("choices", [{}])[0].get("message", {}).get("content", "")
 
     # Split revised text from changes summary
     if "--- CHANGES MADE ---" in full_response:

@@ -174,6 +174,7 @@ function QuestionGenerator() {
     field: "",
     level: "masters" as string,
   });
+  const [provider, setProvider] = useState("claude");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<QuestionsResult | null>(null);
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
@@ -192,7 +193,7 @@ function QuestionGenerator() {
     try {
       const data = await apiPost<QuestionsResult>(
         "/api/defense/generate-questions",
-        form
+        { ...form, provider }
       );
       setResult(data);
       toast.success("Defense questions generated");
@@ -310,23 +311,36 @@ function QuestionGenerator() {
           </div>
         </div>
 
-        <button
-          type="submit"
-          disabled={loading || !form.thesis_title.trim()}
-          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-brand-orange hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50 transition-colors"
-        >
-          {loading ? (
-            <>
-              <Loader2 size={16} className="animate-spin" />
-              Generating...
-            </>
-          ) : (
-            <>
-              <HelpCircle size={16} />
-              Generate Questions
-            </>
-          )}
-        </button>
+        <div className="flex items-center gap-3 flex-wrap">
+          <select
+            value={provider}
+            onChange={(e) => setProvider(e.target.value)}
+            className="bg-dark-700 border border-dark-500 rounded-lg px-3 py-2 text-sm text-white focus:outline-none"
+          >
+            <option value="claude">Claude</option>
+            <option value="deepseek">DeepSeek</option>
+            <option value="gpt4o">GPT-4o</option>
+            <option value="gemini">Gemini</option>
+          </select>
+
+          <button
+            type="submit"
+            disabled={loading || !form.thesis_title.trim()}
+            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-brand-orange hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50 transition-colors"
+          >
+            {loading ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <HelpCircle size={16} />
+                Generate Questions
+              </>
+            )}
+          </button>
+        </div>
       </form>
 
       {/* Results grouped by category */}
@@ -405,6 +419,7 @@ function QuestionGenerator() {
 
 function MockDefense() {
   const [style, setStyle] = useState<ExaminerStyle>("supportive");
+  const [provider, setProvider] = useState("claude");
   const [messages, setMessages] = useState<MockMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -427,6 +442,7 @@ function MockDefense() {
         action: "start",
         examiner_style: style,
         thesis_context: thesisContext,
+        provider,
       });
       setMessages([
         { role: "examiner", content: data.message || "Welcome to your mock defense. Let us begin. Can you start by summarizing the main contribution of your thesis?" },
@@ -459,6 +475,7 @@ function MockDefense() {
             content: m.content,
           })),
           answer: input,
+          provider,
         }
       );
       setMessages([
@@ -539,23 +556,36 @@ function MockDefense() {
             />
           </div>
 
-          <button
-            onClick={startSession}
-            disabled={loading || !thesisContext.trim()}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-brand-orange hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50 transition-colors"
-          >
-            {loading ? (
-              <>
-                <Loader2 size={16} className="animate-spin" />
-                Starting...
-              </>
-            ) : (
-              <>
-                <MessageSquare size={16} />
-                Start Mock Defense
-              </>
-            )}
-          </button>
+          <div className="flex items-center gap-3 flex-wrap">
+            <select
+              value={provider}
+              onChange={(e) => setProvider(e.target.value)}
+              className="bg-dark-700 border border-dark-500 rounded-lg px-3 py-2 text-sm text-white focus:outline-none"
+            >
+              <option value="claude">Claude</option>
+              <option value="deepseek">DeepSeek</option>
+              <option value="gpt4o">GPT-4o</option>
+              <option value="gemini">Gemini</option>
+            </select>
+
+            <button
+              onClick={startSession}
+              disabled={loading || !thesisContext.trim()}
+              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-brand-orange hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50 transition-colors"
+            >
+              {loading ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  Starting...
+                </>
+              ) : (
+                <>
+                  <MessageSquare size={16} />
+                  Start Mock Defense
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -680,6 +710,7 @@ function PresentationBuilder() {
     time_limit: 15,
     slide_style: "minimal" as string,
   });
+  const [provider, setProvider] = useState("claude");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<PresentationResult | null>(null);
 
@@ -697,7 +728,7 @@ function PresentationBuilder() {
     try {
       const data = await apiPost<PresentationResult>(
         "/api/defense/presentation-outline",
-        form
+        { ...form, provider }
       );
       setResult(data);
       toast.success("Presentation outline generated");
@@ -768,23 +799,36 @@ function PresentationBuilder() {
           </div>
         </div>
 
-        <button
-          type="submit"
-          disabled={loading || !form.thesis_title.trim()}
-          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-brand-orange hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50 transition-colors"
-        >
-          {loading ? (
-            <>
-              <Loader2 size={16} className="animate-spin" />
-              Generating...
-            </>
-          ) : (
-            <>
-              <Presentation size={16} />
-              Generate Outline
-            </>
-          )}
-        </button>
+        <div className="flex items-center gap-3 flex-wrap">
+          <select
+            value={provider}
+            onChange={(e) => setProvider(e.target.value)}
+            className="bg-dark-700 border border-dark-500 rounded-lg px-3 py-2 text-sm text-white focus:outline-none"
+          >
+            <option value="claude">Claude</option>
+            <option value="deepseek">DeepSeek</option>
+            <option value="gpt4o">GPT-4o</option>
+            <option value="gemini">Gemini</option>
+          </select>
+
+          <button
+            type="submit"
+            disabled={loading || !form.thesis_title.trim()}
+            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-brand-orange hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50 transition-colors"
+          >
+            {loading ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <Presentation size={16} />
+                Generate Outline
+              </>
+            )}
+          </button>
+        </div>
       </form>
 
       {/* Results */}

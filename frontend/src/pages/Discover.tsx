@@ -128,6 +128,7 @@ function GapFinder() {
   const [topic, setTopic] = useState("");
   const [papersSummary, setPapersSummary] = useState("");
   const [field, setField] = useState("");
+  const [provider, setProvider] = useState("claude");
   const [loading, setLoading] = useState(false);
   const [gaps, setGaps] = useState<ResearchGap[] | null>(null);
 
@@ -142,7 +143,7 @@ function GapFinder() {
     try {
       const data = await apiPost<{ gaps: ResearchGap[] }>(
         "/api/discover/find-gaps",
-        { topic, papers_summary: papersSummary, field }
+        { topic, papers_summary: papersSummary, field, provider }
       );
       setGaps(data.gaps || []);
       toast.success("Research gaps identified");
@@ -190,23 +191,36 @@ function GapFinder() {
           />
         </div>
 
-        <button
-          type="submit"
-          disabled={loading || !topic.trim()}
-          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-brand-orange hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50 transition-colors"
-        >
-          {loading ? (
-            <>
-              <Loader2 size={16} className="animate-spin" />
-              Analyzing...
-            </>
-          ) : (
-            <>
-              <Lightbulb size={16} />
-              Find Research Gaps
-            </>
-          )}
-        </button>
+        <div className="flex items-center gap-3 flex-wrap">
+          <select
+            value={provider}
+            onChange={(e) => setProvider(e.target.value)}
+            className="bg-dark-700 border border-dark-500 rounded-lg px-3 py-2 text-sm text-white focus:outline-none"
+          >
+            <option value="claude">Claude</option>
+            <option value="deepseek">DeepSeek</option>
+            <option value="gpt4o">GPT-4o</option>
+            <option value="gemini">Gemini</option>
+          </select>
+
+          <button
+            type="submit"
+            disabled={loading || !topic.trim()}
+            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-brand-orange hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50 transition-colors"
+          >
+            {loading ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                Analyzing...
+              </>
+            ) : (
+              <>
+                <Lightbulb size={16} />
+                Find Research Gaps
+              </>
+            )}
+          </button>
+        </div>
       </form>
 
       {/* Results */}
@@ -279,6 +293,7 @@ function DebateMode() {
   const [paperA, setPaperA] = useState("");
   const [paperB, setPaperB] = useState("");
   const [topic, setTopic] = useState("");
+  const [provider, setProvider] = useState("claude");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<DebateResult | null>(null);
 
@@ -295,6 +310,7 @@ function DebateMode() {
         paper_a: paperA,
         paper_b: paperB,
         topic,
+        provider,
       });
       setResult(data);
       toast.success("Debate analysis complete");
@@ -343,23 +359,36 @@ function DebateMode() {
           />
         </div>
 
-        <button
-          type="submit"
-          disabled={loading || !paperA.trim() || !paperB.trim()}
-          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-brand-orange hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50 transition-colors"
-        >
-          {loading ? (
-            <>
-              <Loader2 size={16} className="animate-spin" />
-              Analyzing...
-            </>
-          ) : (
-            <>
-              <Swords size={16} />
-              Start Debate
-            </>
-          )}
-        </button>
+        <div className="flex items-center gap-3 flex-wrap">
+          <select
+            value={provider}
+            onChange={(e) => setProvider(e.target.value)}
+            className="bg-dark-700 border border-dark-500 rounded-lg px-3 py-2 text-sm text-white focus:outline-none"
+          >
+            <option value="claude">Claude</option>
+            <option value="deepseek">DeepSeek</option>
+            <option value="gpt4o">GPT-4o</option>
+            <option value="gemini">Gemini</option>
+          </select>
+
+          <button
+            type="submit"
+            disabled={loading || !paperA.trim() || !paperB.trim()}
+            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-brand-orange hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium disabled:opacity-50 transition-colors"
+          >
+            {loading ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                Analyzing...
+              </>
+            ) : (
+              <>
+                <Swords size={16} />
+                Start Debate
+              </>
+            )}
+          </button>
+        </div>
       </form>
 
       {/* Results */}

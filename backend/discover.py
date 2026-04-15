@@ -16,7 +16,7 @@ from database import get_db, User, Project
 from auth import get_current_user
 from config import settings
 from llm_proxy import get_api_key, PROVIDER_MODELS
-from orchestrator import _call_anthropic
+from orchestrator import _call_anthropic, _call_openai_compat
 
 import httpx
 
@@ -61,6 +61,7 @@ class FindGapsRequest(BaseModel):
     topic: str
     papers_summary: str
     field: str
+    provider: str = "claude"
 
 
 class GapItem(BaseModel):
@@ -83,6 +84,7 @@ class DebateRequest(BaseModel):
     paper_a: str
     paper_b: str
     topic: str
+    provider: str = "claude"
 
 
 class ClaimDetail(BaseModel):
@@ -189,8 +191,9 @@ async def find_gaps(
     Uses Claude to find unstudied intersections, methodological gaps,
     population gaps, temporal gaps, and theoretical gaps.
     """
-    api_key = get_api_key("claude")
-    model = PROVIDER_MODELS["claude"]
+    provider = req.provider if req.provider in PROVIDER_MODELS else "claude"
+    api_key = get_api_key(provider)
+    model = PROVIDER_MODELS[provider]
 
     user_message = (
         f"Topic: {req.topic}\n"
@@ -198,12 +201,10 @@ async def find_gaps(
         f"Literature Summary:\n{req.papers_summary}"
     )
 
-    raw_response = await _call_anthropic(
-        GAP_DETECTOR_SYSTEM_PROMPT,
-        user_message,
-        api_key,
-        model,
-    )
+    if provider == "claude":
+        raw_response = await _call_anthropic(GAP_DETECTOR_SYSTEM_PROMPT, user_message, api_key, model)
+    else:
+        raw_response = await _call_openai_compat(GAP_DETECTOR_SYSTEM_PROMPT, user_message, api_key, model, provider)
 
     # Parse the JSON array from the LLM response
     try:
@@ -268,8 +269,9 @@ async def debate(
     Analyzes claims, evidence quality, agreements, contradictions, and
     provides a balanced synthesis with future research implications.
     """
-    api_key = get_api_key("claude")
-    model = PROVIDER_MODELS["claude"]
+    provider = req.provider if req.provider in PROVIDER_MODELS else "claude"
+    api_key = get_api_key(provider)
+    model = PROVIDER_MODELS[provider]
 
     user_message = (
         f"Topic of debate: {req.topic}\n\n"
@@ -277,12 +279,10 @@ async def debate(
         f"--- PAPER B ---\n{req.paper_b}"
     )
 
-    raw_response = await _call_anthropic(
-        DEBATE_SYSTEM_PROMPT,
-        user_message,
-        api_key,
-        model,
-    )
+    if provider == "claude":
+        raw_response = await _call_anthropic(DEBATE_SYSTEM_PROMPT, user_message, api_key, model)
+    else:
+        raw_response = await _call_openai_compat(DEBATE_SYSTEM_PROMPT, user_message, api_key, model, provider)
 
     try:
         debate_data = _parse_json_response(raw_response)

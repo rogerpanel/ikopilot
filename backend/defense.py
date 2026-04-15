@@ -14,7 +14,7 @@ from pydantic import BaseModel
 from auth import get_current_user
 from database import User
 from llm_proxy import get_api_key, PROVIDER_MODELS
-from orchestrator import _call_anthropic
+from orchestrator import _call_anthropic, _call_openai_compat
 
 
 router = APIRouter(prefix="/api/defense", tags=["defense"])
@@ -135,12 +135,14 @@ class DefenseRequest(BaseModel):
     limitations: str = ""
     field: str = ""
     level: str = "Master's thesis"  # or PhD dissertation, Bachelor's project
+    provider: str = "claude"
 
 
 class MockSessionRequest(BaseModel):
     thesis_content: str
     examiner_style: str  # "supportive", "critical", "devil's_advocate"
     question: str
+    provider: str = "claude"
 
 
 class PresentationOutlineRequest(BaseModel):
@@ -148,6 +150,7 @@ class PresentationOutlineRequest(BaseModel):
     abstract: str
     time_limit: int  # minutes
     slide_style: str = "detailed"  # "minimal", "detailed", "visual"
+    provider: str = "claude"
 
 
 # ---------- Helpers ----------
@@ -279,10 +282,14 @@ async def generate_defense_questions(
 
     user_message = _build_question_gen_message(req)
 
-    api_key = get_api_key("claude")
-    model = PROVIDER_MODELS["claude"]
+    provider = req.provider if req.provider in PROVIDER_MODELS else "claude"
+    api_key = get_api_key(provider)
+    model = PROVIDER_MODELS[provider]
 
-    response_text = await _call_anthropic(system_prompt, user_message, api_key, model)
+    if provider == "claude":
+        response_text = await _call_anthropic(system_prompt, user_message, api_key, model)
+    else:
+        response_text = await _call_openai_compat(system_prompt, user_message, api_key, model, provider)
 
     parsed = _parse_json_response(response_text)
 
@@ -319,10 +326,14 @@ async def mock_defense_session(
 
     user_message = _build_mock_session_message(req)
 
-    api_key = get_api_key("claude")
-    model = PROVIDER_MODELS["claude"]
+    provider = req.provider if req.provider in PROVIDER_MODELS else "claude"
+    api_key = get_api_key(provider)
+    model = PROVIDER_MODELS[provider]
 
-    response_text = await _call_anthropic(system_prompt, user_message, api_key, model)
+    if provider == "claude":
+        response_text = await _call_anthropic(system_prompt, user_message, api_key, model)
+    else:
+        response_text = await _call_openai_compat(system_prompt, user_message, api_key, model, provider)
 
     parsed = _parse_json_response(response_text)
 
@@ -363,10 +374,14 @@ async def generate_presentation_outline(
     system_prompt = PRESENTATION_OUTLINE_SYSTEM_PROMPT
     user_message = _build_presentation_message(req)
 
-    api_key = get_api_key("claude")
-    model = PROVIDER_MODELS["claude"]
+    provider = req.provider if req.provider in PROVIDER_MODELS else "claude"
+    api_key = get_api_key(provider)
+    model = PROVIDER_MODELS[provider]
 
-    response_text = await _call_anthropic(system_prompt, user_message, api_key, model)
+    if provider == "claude":
+        response_text = await _call_anthropic(system_prompt, user_message, api_key, model)
+    else:
+        response_text = await _call_openai_compat(system_prompt, user_message, api_key, model, provider)
 
     parsed = _parse_json_response(response_text)
 
