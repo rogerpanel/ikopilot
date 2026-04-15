@@ -5,7 +5,14 @@ Removes AI writing patterns, improves academic English, and reduces
 plagiarism/AI detection scores. Reusable across the entire application.
 """
 
-from fastapi import APIRouter, Depends, HTTPException
+import io
+import re
+import difflib
+from pathlib import Path
+from tempfile import NamedTemporaryFile
+
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi.responses import Response
 from pydantic import BaseModel
 from auth import get_current_user
 from database import User
@@ -333,3 +340,282 @@ async def detect_ai_patterns(
             "High risk — significant AI patterns. Strongly recommend humanizing."
         ),
     }
+
+
+# ---------- File Upload & Text Extraction ----------
+
+ALLOWED_UPLOAD_TYPES = {
+    "application/pdf": "pdf",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
+    "application/x-tex": "tex",
+    "text/x-tex": "tex",
+    "text/plain": "tex",  # .tex files sometimes come as text/plain
+}
+
+MAX_UPLOAD_SIZE = 20 * 1024 * 1024  # 20 MB
+
+
+def _extract_text_pdf(data: bytes) -> str:
+    import fitz
+    doc = fitz.open(stream=data, filetype="pdf")
+    text = ""
+    for page in doc:
+        text += page.get_text() + "\n"
+    doc.close()
+    return text.strip()
+
+
+def _extract_text_docx(data: bytes) -> str:
+    from docx import Document
+    doc = Document(io.BytesIO(data))
+    paragraphs = [p.text for p in doc.paragraphs if p.text.strip()]
+    return "\n\n".join(paragraphs)
+
+
+def _extract_text_tex(data: bytes) -> str:
+    text = data.decode("utf-8", errors="replace")
+    # Strip LaTeX preamble (everything before \begin{document})
+    begin_match = re.search(r"\\begin\{document\}", text)
+    if begin_match:
+        text = text[begin_match.end():]
+    # Strip \end{document}
+    text = re.sub(r"\\end\{document\}.*", "", text, flags=re.DOTALL)
+    # Strip common LaTeX commands but keep text content
+    text = re.sub(r"\\(?:section|subsection|subsubsection|chapter|paragraph)\*?\{([^}]*)\}", r"\n\n\1\n\n", text)
+    text = re.sub(r"\\(?:textbf|textit|emph|underline)\{([^}]*)\}", r"\1", text)
+    text = re.sub(r"\\(?:cite|ref|label|eqref)\{[^}]*\}", "", text)
+    text = re.sub(r"\\(?:begin|end)\{[^}]*\}", "", text)
+    text = re.sub(r"\\[a-zA-Z]+\*?(?:\[[^\]]*\])?(?:\{[^}]*\})?", "", text)
+    text = re.sub(r"[%].*$", "", text, flags=re.MULTILINE)  # comments
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return text.strip()
+
+
+@router.post("/upload")
+async def upload_file(
+    file: UploadFile = File(...),
+    user: User = Depends(get_current_user),
+):
+    """Upload a PDF, DOCX, or LaTeX file and extract text for humanizing."""
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="No file provided")
+
+    ext = Path(file.filename).suffix.lower()
+    content_type = file.content_type or ""
+
+    # Determine format
+    if ext == ".pdf" or "pdf" in content_type:
+        fmt = "pdf"
+    elif ext == ".docx" or "wordprocessing" in content_type:
+        fmt = "docx"
+    elif ext in (".tex", ".latex") or "tex" in content_type:
+        fmt = "tex"
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail="Unsupported file type. Upload PDF, DOCX, or .tex files.",
+        )
+
+    data = await file.read()
+    if len(data) > MAX_UPLOAD_SIZE:
+        raise HTTPException(status_code=400, detail="File too large. Maximum 20 MB.")
+
+    try:
+        if fmt == "pdf":
+            text = _extract_text_pdf(data)
+        elif fmt == "docx":
+            text = _extract_text_docx(data)
+        else:
+            text = _extract_text_tex(data)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to extract text: {str(e)}")
+
+    if not text.strip():
+        raise HTTPException(status_code=400, detail="No text could be extracted from the file.")
+
+    word_count = len(text.split())
+    return {
+        "text": text,
+        "filename": file.filename,
+        "format": fmt,
+        "word_count": word_count,
+    }
+
+
+# ---------- Word-Level Diff for Writefull-Style View ----------
+
+def compute_word_diff(original: str, revised: str) -> list[dict]:
+    """Compute a word-level diff between original and revised text.
+
+    Returns a list of segments:
+    - {"type": "equal", "text": "..."}
+    - {"type": "delete", "text": "..."}    (red strikethrough)
+    - {"type": "insert", "text": "..."}    (green highlight)
+    """
+    # Split into words preserving whitespace
+    orig_words = original.split()
+    rev_words = revised.split()
+
+    sm = difflib.SequenceMatcher(None, orig_words, rev_words)
+    segments = []
+
+    for op, i1, i2, j1, j2 in sm.get_opcodes():
+        if op == "equal":
+            segments.append({"type": "equal", "text": " ".join(orig_words[i1:i2])})
+        elif op == "delete":
+            segments.append({"type": "delete", "text": " ".join(orig_words[i1:i2])})
+        elif op == "insert":
+            segments.append({"type": "insert", "text": " ".join(rev_words[j1:j2])})
+        elif op == "replace":
+            segments.append({"type": "delete", "text": " ".join(orig_words[i1:i2])})
+            segments.append({"type": "insert", "text": " ".join(rev_words[j1:j2])})
+
+    return segments
+
+
+class DiffRequest(BaseModel):
+    original: str
+    revised: str
+
+
+@router.post("/diff")
+async def get_diff(
+    req: DiffRequest,
+    user: User = Depends(get_current_user),
+):
+    """Compute word-level diff between original and revised text for Writefull-style view."""
+    segments = compute_word_diff(req.original, req.revised)
+    stats = {
+        "deletions": sum(1 for s in segments if s["type"] == "delete"),
+        "insertions": sum(1 for s in segments if s["type"] == "insert"),
+        "unchanged": sum(1 for s in segments if s["type"] == "equal"),
+    }
+    return {"segments": segments, "stats": stats}
+
+
+# ---------- Export Corrected Document ----------
+
+class ExportCorrectedRequest(BaseModel):
+    original: str
+    revised: str
+    format: str = "docx"  # docx | tex
+    filename: str = "corrected_document"
+
+
+@router.post("/export")
+async def export_corrected(
+    req: ExportCorrectedRequest,
+    user: User = Depends(get_current_user),
+):
+    """Export the corrected document as DOCX (with tracked changes) or LaTeX."""
+    if req.format == "tex":
+        return _export_tex_diff(req)
+    else:
+        return _export_docx_diff(req)
+
+
+def _export_docx_diff(req: ExportCorrectedRequest) -> Response:
+    """Generate a DOCX with tracked-changes-style formatting.
+
+    Deletions shown as red strikethrough, insertions as green underlined.
+    """
+    from docx import Document
+    from docx.shared import Pt, RGBColor
+    from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+
+    doc = Document()
+
+    style = doc.styles["Normal"]
+    font = style.font
+    font.name = "Times New Roman"
+    font.size = Pt(12)
+    style.paragraph_format.line_spacing = 1.5
+
+    # Title
+    title_para = doc.add_heading("Corrected Document", level=1)
+    title_para.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
+    segments = compute_word_diff(req.original, req.revised)
+
+    # Group segments into paragraphs by looking for double newlines
+    para = doc.add_paragraph()
+
+    for seg in segments:
+        text = seg["text"]
+        if not text:
+            continue
+
+        # Check for paragraph breaks
+        parts = text.split("\n\n")
+        for idx, part in enumerate(parts):
+            if idx > 0:
+                para = doc.add_paragraph()
+            if not part.strip():
+                continue
+
+            run = para.add_run(part + " ")
+            run.font.name = "Times New Roman"
+            run.font.size = Pt(12)
+
+            if seg["type"] == "delete":
+                run.font.color.rgb = RGBColor(220, 38, 38)  # red
+                run.font.strike = True
+            elif seg["type"] == "insert":
+                run.font.color.rgb = RGBColor(22, 163, 74)  # green
+                run.font.underline = True
+
+    buf = io.BytesIO()
+    doc.save(buf)
+    buf.seek(0)
+
+    safe_name = re.sub(r"[^a-zA-Z0-9_\- ]", "", req.filename).replace(" ", "_")
+    return Response(
+        content=buf.getvalue(),
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        headers={"Content-Disposition": f'attachment; filename="{safe_name}_corrected.docx"'},
+    )
+
+
+def _export_tex_diff(req: ExportCorrectedRequest) -> Response:
+    """Generate a LaTeX file with corrections marked using color commands."""
+    segments = compute_word_diff(req.original, req.revised)
+
+    tex = (
+        "\\documentclass[12pt,a4paper]{article}\n"
+        "\\usepackage[utf8]{inputenc}\n"
+        "\\usepackage[margin=1in]{geometry}\n"
+        "\\usepackage{xcolor}\n"
+        "\\usepackage{ulem}\n"
+        "\\usepackage{setspace}\n"
+        "\\onehalfspacing\n\n"
+        "% Correction commands\n"
+        "\\newcommand{\\deleted}[1]{\\textcolor{red}{\\sout{#1}}}\n"
+        "\\newcommand{\\inserted}[1]{\\textcolor{green!60!black}{\\underline{#1}}}\n\n"
+        "\\begin{document}\n\n"
+        "\\section*{Corrected Document}\n\n"
+    )
+
+    for seg in segments:
+        text = seg["text"]
+        if not text:
+            continue
+        # Escape LaTeX special chars
+        escaped = text.replace("\\", "\\textbackslash ")
+        for ch in "&%$#_{}~^":
+            escaped = escaped.replace(ch, f"\\{ch}")
+
+        if seg["type"] == "equal":
+            tex += escaped + " "
+        elif seg["type"] == "delete":
+            tex += f"\\deleted{{{escaped}}} "
+        elif seg["type"] == "insert":
+            tex += f"\\inserted{{{escaped}}} "
+
+    tex += "\n\n\\end{document}\n"
+
+    safe_name = re.sub(r"[^a-zA-Z0-9_\- ]", "", req.filename).replace(" ", "_")
+    return Response(
+        content=tex.encode("utf-8"),
+        media_type="application/x-tex",
+        headers={"Content-Disposition": f'attachment; filename="{safe_name}_corrected.tex"'},
+    )
