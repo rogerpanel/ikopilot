@@ -33,6 +33,14 @@ class Settings:
     admin_email: str = os.getenv("ADMIN_EMAIL", "admin@ikopilot.com")
     admin_password: str = os.getenv("ADMIN_PASSWORD", "admin")
 
+    # SMTP (for password reset emails)
+    smtp_host: str = os.getenv("SMTP_HOST", "")
+    smtp_port: int = int(os.getenv("SMTP_PORT", "587"))
+    smtp_user: str = os.getenv("SMTP_USER", "")
+    smtp_password: str = os.getenv("SMTP_PASSWORD", "")
+    smtp_from_email: str = os.getenv("SMTP_FROM_EMAIL", "noreply@ikopilot.com")
+    smtp_from_name: str = os.getenv("SMTP_FROM_NAME", "iKopilot")
+
     # App
     app_name: str = os.getenv("APP_NAME", "iKopilot")
     app_url: str = os.getenv("APP_URL", "https://ikopilot.com")

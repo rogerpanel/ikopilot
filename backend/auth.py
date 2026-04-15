@@ -2,6 +2,11 @@
 
 from datetime import datetime, timedelta, timezone
 from typing import Optional
+import secrets
+import logging
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -11,8 +16,10 @@ from pydantic import BaseModel, EmailStr
 import bcrypt
 import jwt
 
-from database import get_db, User, Subscription, SubscriptionTier, UserRole, Program
+from database import get_db, User, Subscription, SubscriptionTier, UserRole, Program, PasswordResetToken
 from config import settings
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 security = HTTPBearer()
@@ -65,6 +72,15 @@ class UpdateProfileRequest(BaseModel):
 
 class ChangePasswordRequest(BaseModel):
     current_password: str
+    new_password: str
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
     new_password: str
 
 
@@ -258,6 +274,158 @@ async def change_password(
     )
     await db.commit()
     return {"message": "Password updated successfully"}
+
+
+def send_reset_email(to_email: str, reset_link: str) -> bool:
+    """Send password reset email via SMTP. Returns True if sent, False if SMTP not configured."""
+    if not settings.smtp_host or not settings.smtp_user:
+        logger.warning("SMTP not configured — reset link logged instead: %s", reset_link)
+        return False
+
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = "iKopilot — Reset Your Password"
+    msg["From"] = f"{settings.smtp_from_name} <{settings.smtp_from_email}>"
+    msg["To"] = to_email
+
+    text_body = f"""Hi,
+
+You requested a password reset for your iKopilot account.
+
+Click the link below to set a new password (valid for 1 hour):
+{reset_link}
+
+If you didn't request this, you can safely ignore this email.
+
+— iKopilot Team
+"""
+
+    html_body = f"""
+<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px 20px;">
+  <div style="text-align: center; margin-bottom: 24px;">
+    <h2 style="color: #F97316; margin: 0;">iKopilot</h2>
+    <p style="color: #9CA3AF; font-size: 13px; margin: 4px 0 0;">Your Intelligent Research Co-Pilot</p>
+  </div>
+  <div style="background: #1F2937; border-radius: 12px; padding: 32px; border: 1px solid #374151;">
+    <h3 style="color: #F3F4F6; margin: 0 0 12px;">Reset your password</h3>
+    <p style="color: #9CA3AF; font-size: 14px; line-height: 1.6; margin: 0 0 24px;">
+      You requested a password reset. Click the button below to choose a new password. This link expires in 1 hour.
+    </p>
+    <div style="text-align: center; margin-bottom: 24px;">
+      <a href="{reset_link}" style="display: inline-block; background: #F97316; color: #fff; text-decoration: none; padding: 12px 32px; border-radius: 8px; font-weight: 600; font-size: 14px;">
+        Set New Password
+      </a>
+    </div>
+    <p style="color: #6B7280; font-size: 12px; margin: 0;">
+      If you didn't request this, you can safely ignore this email.
+    </p>
+  </div>
+  <p style="color: #4B5563; font-size: 11px; text-align: center; margin-top: 20px;">
+    &copy; iKopilot &mdash; ikopilot.com
+  </p>
+</div>
+"""
+
+    msg.attach(MIMEText(text_body, "plain"))
+    msg.attach(MIMEText(html_body, "html"))
+
+    try:
+        with smtplib.SMTP(settings.smtp_host, settings.smtp_port) as server:
+            server.starttls()
+            server.login(settings.smtp_user, settings.smtp_password)
+            server.sendmail(settings.smtp_from_email, to_email, msg.as_string())
+        logger.info("Password reset email sent to %s", to_email)
+        return True
+    except Exception as e:
+        logger.error("Failed to send reset email to %s: %s", to_email, e)
+        return False
+
+
+@router.post("/forgot-password")
+async def forgot_password(req: ForgotPasswordRequest, db: AsyncSession = Depends(get_db)):
+    """Request a password reset. Always returns success to prevent email enumeration."""
+    result = await db.execute(select(User).where(User.email == req.email))
+    user = result.scalar_one_or_none()
+
+    response = {
+        "message": "If an account with that email exists, a password reset link has been sent.",
+        "email_registered": user is not None,
+    }
+
+    if not user:
+        return response
+
+    # Invalidate any existing unused tokens for this user
+    await db.execute(
+        update(PasswordResetToken)
+        .where(PasswordResetToken.user_id == user.id, PasswordResetToken.used == False)
+        .values(used=True)
+    )
+
+    # Generate a secure token
+    token = secrets.token_urlsafe(48)
+    expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
+
+    reset_token = PasswordResetToken(
+        user_id=user.id,
+        token=token,
+        expires_at=expires_at,
+    )
+    db.add(reset_token)
+    await db.commit()
+
+    reset_link = f"{settings.app_url}/reset-password?token={token}"
+    email_sent = send_reset_email(user.email, reset_link)
+
+    if not email_sent:
+        # SMTP not configured — return the link so admin can share it
+        response["reset_link"] = reset_link
+        response["note"] = "SMTP not configured. Share this link with the user manually."
+
+    return response
+
+
+@router.post("/reset-password")
+async def reset_password(req: ResetPasswordRequest, db: AsyncSession = Depends(get_db)):
+    """Set a new password using a valid reset token."""
+    result = await db.execute(
+        select(PasswordResetToken).where(
+            PasswordResetToken.token == req.token,
+            PasswordResetToken.used == False,
+        )
+    )
+    reset_token = result.scalar_one_or_none()
+
+    if not reset_token:
+        raise HTTPException(status_code=400, detail="Invalid or expired reset link")
+
+    if reset_token.expires_at < datetime.now(timezone.utc):
+        reset_token.used = True
+        await db.commit()
+        raise HTTPException(status_code=400, detail="Reset link has expired. Please request a new one.")
+
+    if len(req.new_password) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
+
+    # Update password
+    await db.execute(
+        update(User)
+        .where(User.id == reset_token.user_id)
+        .values(password_hash=hash_password(req.new_password))
+    )
+
+    # Mark token as used
+    reset_token.used = True
+    await db.commit()
+
+    return {"message": "Password has been reset successfully. You can now sign in with your new password."}
+
+
+@router.post("/check-email")
+async def check_email(req: ForgotPasswordRequest, db: AsyncSession = Depends(get_db)):
+    """Check if an email is registered (used by the forgot-password form)."""
+    result = await db.execute(select(User).where(User.email == req.email))
+    user = result.scalar_one_or_none()
+    return {"registered": user is not None}
 
 
 @router.get("/subscription")

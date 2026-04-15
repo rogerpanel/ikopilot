@@ -79,18 +79,12 @@ export default function Login() {
           </button>
 
           <p className="mt-3 text-center text-sm text-gray-500">
-            <button
-              type="button"
-              onClick={() => {
-                const email = prompt("Enter your email address to reset your password:");
-                if (email) {
-                  alert("If an account exists with that email, password reset instructions will be sent. For now during testing, contact admin@ikopilot.com to reset your password.");
-                }
-              }}
+            <Link
+              to="/forgot-password"
               className="text-gray-500 hover:text-brand-blue hover:underline"
             >
               Forgot password?
-            </button>
+            </Link>
           </p>
 
           <p className="mt-2 text-center text-sm text-gray-400">
