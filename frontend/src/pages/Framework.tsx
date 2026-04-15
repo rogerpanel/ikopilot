@@ -40,6 +40,7 @@ export default function Framework() {
   const [showChat, setShowChat] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [refining, setRefining] = useState(false);
+  const [provider, setProvider] = useState("claude");
   const [uploadedFile, setUploadedFile] = useState<{ name: string; extracted_text: string } | null>(null);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -57,6 +58,7 @@ export default function Framework() {
         context: "",
         conversation_history: chatHistory.map((m) => ({ role: m.role, content: m.content })),
         uploaded_file_context: uploadedFile?.extracted_text || "",
+        provider,
       });
       setOutput(res.content);
       setChatHistory([
@@ -184,6 +186,21 @@ export default function Framework() {
               </button>
             );
           })}
+
+          {/* LLM Provider */}
+          <div className="pt-3 border-t border-dark-500/20">
+            <label className="block text-[10px] text-gray-500 uppercase tracking-wide mb-1.5">LLM Provider</label>
+            <select
+              value={provider}
+              onChange={(e) => setProvider(e.target.value)}
+              className="w-full bg-dark-700 border border-dark-500 rounded-lg px-3 py-2 text-sm text-white focus:outline-none"
+            >
+              <option value="claude">Claude</option>
+              <option value="deepseek">DeepSeek</option>
+              <option value="gpt4o">GPT-4o</option>
+              <option value="gemini">Gemini</option>
+            </select>
+          </div>
 
           {/* File upload */}
           <div className="pt-3 border-t border-dark-500/20">

@@ -82,6 +82,7 @@ export default function Advisor() {
   /* State */
   const [field, setField] = useState("");
   const [level, setLevel] = useState("");
+  const [provider, setProvider] = useState("claude");
   const [messages, setChatMessages] = useState<ChatMessage[]>([]);
   const [tips, setTips] = useState<string[]>([]);
   const [input, setInput] = useState("");
@@ -193,6 +194,7 @@ export default function Advisor() {
         messages: history,
         field: field || undefined,
         level: level || undefined,
+        provider,
       });
 
       const advisorMsg: ChatMessage = {
@@ -289,6 +291,21 @@ export default function Advisor() {
                   {l.label}
                 </option>
               ))}
+            </select>
+          </div>
+
+          {/* LLM Provider */}
+          <div>
+            <label className="block text-xs text-gray-400 mb-1.5">LLM Provider</label>
+            <select
+              value={provider}
+              onChange={(e) => setProvider(e.target.value)}
+              className="bg-dark-700 border border-dark-500 rounded-lg px-3 py-2 text-sm text-white focus:outline-none"
+            >
+              <option value="claude">Claude</option>
+              <option value="deepseek">DeepSeek</option>
+              <option value="gpt4o">GPT-4o</option>
+              <option value="gemini">Gemini</option>
             </select>
           </div>
 

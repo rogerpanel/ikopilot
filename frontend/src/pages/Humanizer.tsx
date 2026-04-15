@@ -120,6 +120,7 @@ export default function Humanizer() {
   const [inputText, setInputText] = useState("");
   const [intensity, setIntensity] = useState<Intensity>("medium");
   const [focus, setFocus] = useState<FocusMode>("all");
+  const [provider, setProvider] = useState("claude");
   const [uploadedFile, setUploadedFile] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -228,6 +229,7 @@ export default function Humanizer() {
         text: inputText,
         intensity,
         focus,
+        provider,
       });
       setRevisedText(data.revised_text);
       setChangesSummary(data.changes_summary);
@@ -422,6 +424,23 @@ export default function Humanizer() {
                     {opt.label}
                   </option>
                 ))}
+              </select>
+            </div>
+
+            {/* LLM Provider */}
+            <div>
+              <label className="block text-sm text-gray-300 mb-1.5">
+                LLM Provider
+              </label>
+              <select
+                value={provider}
+                onChange={(e) => setProvider(e.target.value)}
+                className="bg-dark-700 border border-dark-500 rounded-lg px-3 py-2 text-sm text-white focus:outline-none"
+              >
+                <option value="claude">Claude</option>
+                <option value="deepseek">DeepSeek</option>
+                <option value="gpt4o">GPT-4o</option>
+                <option value="gemini">Gemini</option>
               </select>
             </div>
 
