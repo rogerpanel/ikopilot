@@ -1,4 +1,4 @@
-"""Environment configuration for iKopilot."""
+"""Environment configuration for iKoPilot.com."""
 
 import os
 import json
@@ -39,10 +39,10 @@ class Settings:
     smtp_user: str = os.getenv("SMTP_USER", "")
     smtp_password: str = os.getenv("SMTP_PASSWORD", "")
     smtp_from_email: str = os.getenv("SMTP_FROM_EMAIL", "noreply@ikopilot.com")
-    smtp_from_name: str = os.getenv("SMTP_FROM_NAME", "iKopilot")
+    smtp_from_name: str = os.getenv("SMTP_FROM_NAME", "iKoPilot.com")
 
     # App
-    app_name: str = os.getenv("APP_NAME", "iKopilot")
+    app_name: str = os.getenv("APP_NAME", "iKoPilot.com")
     app_url: str = os.getenv("APP_URL", "https://ikopilot.com")
     environment: str = os.getenv("ENVIRONMENT", "development")
     debug: bool = os.getenv("DEBUG", "true").lower() == "true"

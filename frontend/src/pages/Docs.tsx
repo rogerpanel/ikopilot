@@ -49,11 +49,11 @@ export default function Docs() {
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 max-w-4xl">
-        <h1 className="text-2xl font-bold text-white mb-1">iKopilot User Guide</h1>
+        <h1 className="text-2xl font-bold text-white mb-1">iKoPilot.com User Guide</h1>
         <p className="text-sm text-gray-400 mb-8">Your Intelligent Research Co-Pilot — complete documentation</p>
 
         <Section id="getting-started" title="Getting Started">
-          <P>Create an account at <Code>/register</Code> with your university email. Choose your program level (BSc, BA, MSc, MA, PhD) — iKopilot adapts its responses to your academic level.</P>
+          <P>Create an account at <Code>/register</Code> with your university email. Choose your program level (BSc, BA, MSc, MA, PhD) — iKoPilot.com adapts its responses to your academic level.</P>
           <P>Your 7-day free trial includes 5,000 tokens/day with DeepSeek. Upgrade to Starter ($9.99/mo) for Claude access, or Pro ($24.99/mo) for all 4 AI models, file upload, and premium features.</P>
           <Tip>Start with the Chat page for quick questions, or jump to iKo All-in-One if you need to write an entire thesis chapter.</Tip>
         </Section>
@@ -145,7 +145,7 @@ export default function Docs() {
         </Section>
 
         <div className="border-t border-dark-500/20 mt-12 pt-6 text-center">
-          <p className="text-xs text-gray-600">iKopilot v1.0 — Your Intelligent Research Co-Pilot</p>
+          <p className="text-xs text-gray-600">iKoPilot.com v1.0 — Your Intelligent Research Co-Pilot</p>
           <p className="text-xs text-gray-600 mt-1">Need help? Contact admin@ikopilot.com</p>
         </div>
       </div>

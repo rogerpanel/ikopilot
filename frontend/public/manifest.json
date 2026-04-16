@@ -1,6 +1,6 @@
 {
-  "name": "iKopilot — Your Intelligent Research Co-Pilot",
-  "short_name": "iKopilot",
+  "name": "iKoPilot.com — Your Intelligent Research Co-Pilot",
+  "short_name": "iKoPilot.com",
   "description": "AI-powered research assistant for university students",
   "start_url": "/",
   "display": "standalone",

@@ -1,4 +1,4 @@
-"""iKopilot FastAPI application — multi-LLM research assistant for grad students."""
+"""iKoPilot.com FastAPI application — multi-LLM research assistant for grad students."""
 
 from contextlib import asynccontextmanager
 import asyncio
@@ -68,7 +68,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="iKopilot API",
+    title="iKoPilot.com API",
     description="Multi-LLM research assistant for graduate students",
     version="1.0.0",
     lifespan=lifespan,

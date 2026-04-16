@@ -256,15 +256,13 @@ export default function Layout() {
         }`}
       >
         {/* Header */}
-        <div className="h-14 lg:h-10 flex items-center justify-between px-4 border-b border-dark-500/30">
-          <span className="text-[10px] uppercase tracking-wider text-gray-600">
-            TOOLS
-          </span>
+        <div className="h-14 flex items-center justify-between px-4 border-b border-dark-500/30">
+          <Logo size="md" />
           <button
-            className="lg:hidden text-gray-400 hover:text-white"
             onClick={() => setRightOpen(false)}
+            className="text-gray-400 hover:text-white"
           >
-            <X size={18} />
+            <X size={20} />
           </button>
         </div>
 

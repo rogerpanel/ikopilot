@@ -152,7 +152,7 @@ async def export_conversation(
     elif format == "txt":
         lines = [f"Conversation: {title}", f"Date: {date}", f"Provider: {conv.provider.value if conv.provider else 'N/A'}", ""]
         for msg in messages:
-            role = "You" if msg["role"] == "user" else "iKopilot"
+            role = "You" if msg["role"] == "user" else "iKoPilot.com"
             lines.append(f"[{role}]")
             lines.append(msg["content"])
             lines.append("")
@@ -165,7 +165,7 @@ async def export_conversation(
             if msg["role"] == "user":
                 lines.append(f"## You")
             else:
-                lines.append(f"## iKopilot")
+                lines.append(f"## iKoPilot.com")
             lines.append(msg["content"])
             lines.append("")
         content = "\n".join(lines)

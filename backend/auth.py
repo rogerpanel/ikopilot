@@ -283,26 +283,26 @@ def send_reset_email(to_email: str, reset_link: str) -> bool:
         return False
 
     msg = MIMEMultipart("alternative")
-    msg["Subject"] = "iKopilot — Reset Your Password"
+    msg["Subject"] = "iKoPilot.com — Reset Your Password"
     msg["From"] = f"{settings.smtp_from_name} <{settings.smtp_from_email}>"
     msg["To"] = to_email
 
     text_body = f"""Hi,
 
-You requested a password reset for your iKopilot account.
+You requested a password reset for your iKoPilot.com account.
 
 Click the link below to set a new password (valid for 1 hour):
 {reset_link}
 
 If you didn't request this, you can safely ignore this email.
 
-— iKopilot Team
+— iKoPilot.com Team
 """
 
     html_body = f"""
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px 20px;">
   <div style="text-align: center; margin-bottom: 24px;">
-    <h2 style="color: #F97316; margin: 0;">iKopilot</h2>
+    <h2 style="color: #F97316; margin: 0;">iKoPilot.com</h2>
     <p style="color: #9CA3AF; font-size: 13px; margin: 4px 0 0;">Your Intelligent Research Co-Pilot</p>
   </div>
   <div style="background: #1F2937; border-radius: 12px; padding: 32px; border: 1px solid #374151;">
@@ -320,7 +320,7 @@ If you didn't request this, you can safely ignore this email.
     </p>
   </div>
   <p style="color: #4B5563; font-size: 11px; text-align: center; margin-top: 20px;">
-    &copy; iKopilot &mdash; ikopilot.com
+    &copy; iKoPilot.com
   </p>
 </div>
 """

@@ -251,7 +251,7 @@ export default function Landing() {
                 1. Sign up &amp; choose your level
               </h3>
               <p className="text-sm text-gray-400">
-                BSc, MSc, or PhD — iKopilot adapts to your academic level
+                BSc, MSc, or PhD — iKoPilot.com adapts to your academic level
               </p>
             </div>
             <div className="text-center">
@@ -333,7 +333,7 @@ export default function Landing() {
           4 AI Models, Each with Unique Strengths
         </h2>
         <p className="text-gray-400 text-center mb-10 max-w-xl mx-auto">
-          Choose the right model for each task — or let iKopilot guide you
+          Choose the right model for each task — or let iKoPilot.com guide you
         </p>
         <LLMComparison />
       </section>
@@ -401,7 +401,7 @@ export default function Landing() {
       <section className="px-6 py-16 bg-dark-800/30">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl sm:text-3xl font-bold mb-6">
-            Who is iKopilot for?
+            Who is iKoPilot.com for?
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div>
@@ -452,7 +452,7 @@ export default function Landing() {
             </span>
           </div>
           <p className="text-xs text-gray-600">
-            &copy; {new Date().getFullYear()} iKopilot. All rights reserved.
+            &copy; {new Date().getFullYear()} iKoPilot.com. All rights reserved.
           </p>
         </div>
       </footer>

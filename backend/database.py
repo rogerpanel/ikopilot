@@ -1,4 +1,4 @@
-"""Database models and session management for iKopilot."""
+"""Database models and session management for iKoPilot.com."""
 
 from datetime import datetime, timezone
 from sqlalchemy import (
