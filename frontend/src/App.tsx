@@ -22,6 +22,7 @@ import Advisor from "./pages/Advisor";
 import DocHandler from "./pages/DocHandler";
 import Docs from "./pages/Docs";
 import LitReview from "./pages/LitReview";
+import JournalWriter from "./pages/JournalWriter";
 import Layout from "./components/Layout";
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -81,6 +82,7 @@ export default function App() {
           <Route path="advisor" element={<Advisor />} />
           <Route path="doc-handler" element={<DocHandler />} />
           <Route path="lit-review" element={<LitReview />} />
+          <Route path="journal" element={<JournalWriter />} />
           <Route path="docs" element={<Docs />} />
           <Route
             path="supervisor"

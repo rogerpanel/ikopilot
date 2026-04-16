@@ -21,6 +21,7 @@ import {
   User,
   HelpCircle,
   BookOpenCheck,
+  BookMarked,
 } from "lucide-react";
 import { clearAuth, getStoredUser, isAdmin } from "../utils/auth";
 import Logo from "./Logo";
@@ -58,8 +59,12 @@ export default function Layout() {
         { to: "/all-in-one", label: "iKo All-in-One", icon: Sparkles },
         { to: "/projects", label: "iKo Projects", icon: FolderKanban },
         { to: "/lit-review", label: "iKo Lit-Review", icon: BookOpenCheck },
+        { to: "/journal", label: "iKo Journal", icon: BookMarked },
       ],
     },
+  ];
+
+  const rightNavSections: NavSection[] = [
     {
       label: "TOOLS",
       items: [
@@ -131,9 +136,9 @@ export default function Layout() {
         />
       )}
 
-      {/* ===== LEFT SIDEBAR (220px) ===== */}
+      {/* ===== LEFT SIDEBAR (200px) ===== */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-50 w-[220px] bg-dark-800 border-r border-dark-500/30 flex flex-col transform transition-transform lg:transform-none ${
+        className={`fixed lg:static inset-y-0 left-0 z-50 w-[200px] bg-dark-800 border-r border-dark-500/30 flex flex-col transform transition-transform lg:transform-none ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
@@ -221,14 +226,20 @@ export default function Layout() {
           </button>
         </div>
 
-        {/* Desktop top bar with right sidebar toggle */}
-        <div className="hidden lg:flex h-10 items-center justify-end px-4 border-b border-dark-500/20 bg-dark-800/50">
+        {/* Desktop top bar with sidebar toggles */}
+        <div className="hidden lg:flex h-10 items-center justify-between px-4 border-b border-dark-500/20 bg-dark-800/50">
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-300 transition-colors px-2 py-1 rounded hover:bg-dark-700"
+          >
+            {sidebarOpen ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
+            <span>Nav</span>
+          </button>
           <button
             onClick={() => setRightOpen(!rightOpen)}
             className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-300 transition-colors px-2 py-1 rounded hover:bg-dark-700"
           >
-            <Search size={14} />
-            <span>Papers</span>
+            <span>Tools</span>
             {rightOpen ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
           </button>
         </div>
@@ -238,41 +249,52 @@ export default function Layout() {
         </main>
       </div>
 
-      {/* ===== RIGHT SIDEBAR (280px) — Context Panel ===== */}
+      {/* ===== RIGHT SIDEBAR (200px) — Tools & Intelligence ===== */}
       <aside
-        className={`fixed inset-y-0 right-0 z-50 lg:z-30 w-[280px] bg-dark-800 border-l border-dark-500/30 flex flex-col transform transition-transform ${
-          rightOpen ? "translate-x-0" : "translate-x-full"
+        className={`fixed lg:static inset-y-0 right-0 z-50 w-[200px] bg-dark-800 border-l border-dark-500/30 flex flex-col transform transition-transform lg:transform-none ${
+          rightOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"
         }`}
       >
         {/* Header */}
         <div className="h-14 lg:h-10 flex items-center justify-between px-4 border-b border-dark-500/30">
-          <span className="text-sm font-medium text-gray-300">
-            Paper Search
+          <span className="text-[10px] uppercase tracking-wider text-gray-600">
+            TOOLS
           </span>
           <button
+            className="lg:hidden text-gray-400 hover:text-white"
             onClick={() => setRightOpen(false)}
-            className="text-gray-400 hover:text-white"
           >
             <X size={18} />
           </button>
         </div>
 
-        {/* Quick access buttons */}
-        <div className="flex gap-2 px-3 py-3 border-b border-dark-500/20">
-          <button className="flex-1 text-[11px] font-medium px-2 py-1.5 rounded bg-brand-orange/10 text-brand-orange hover:bg-brand-orange/20 transition-colors">
-            Search Papers
-          </button>
-          <button className="flex-1 text-[11px] font-medium px-2 py-1.5 rounded bg-dark-700 text-gray-400 hover:text-white hover:bg-dark-600 transition-colors">
-            My Citations
-          </button>
-          <button className="flex-1 text-[11px] font-medium px-2 py-1.5 rounded bg-dark-700 text-gray-400 hover:text-white hover:bg-dark-600 transition-colors">
-            Usage Stats
-          </button>
-        </div>
+        {/* Navigation */}
+        <nav className="py-3 px-2 space-y-1 overflow-y-auto">
+          {rightNavSections.map((section) => (
+            <div key={section.label}>
+              {renderSectionLabel(section.label)}
+              <div className="space-y-0.5">
+                {section.items.map(renderNavLink)}
+              </div>
+            </div>
+          ))}
+        </nav>
 
-        {/* Scholar Search content */}
-        <div className="flex-1 overflow-y-auto">
-          <ScholarSearch />
+        {/* Divider */}
+        <div className="border-t border-dark-500/30 mx-2" />
+
+        {/* Paper Search collapsible section */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <button
+            onClick={() => setRightOpen(!rightOpen)}
+            className="flex items-center justify-between px-3 py-2 text-[10px] uppercase tracking-wider text-gray-600 hover:text-gray-400 transition-colors"
+          >
+            <span>Paper Search</span>
+            <Search size={12} />
+          </button>
+          <div className="flex-1 overflow-y-auto">
+            <ScholarSearch />
+          </div>
         </div>
       </aside>
 
