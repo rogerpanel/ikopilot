@@ -1,6 +1,6 @@
 /**
  * iKoPilot.com Logo component with fire dot on the 'i'.
- * "iKo" is colored (orange i, blue K, orange o), "P" is blue, "ilot" is white, ".com" is gray.
+ * "iKo" is colored (orange i, blue K, orange o), "Pilot" is white, ".com" is gray.
  */
 
 interface LogoProps {
@@ -59,8 +59,7 @@ export default function Logo({ size = "md", className = "" }: LogoProps) {
       </span>
       <span className="text-brand-blue">K</span>
       <span className="text-brand-orange">o</span>
-      <span className="text-brand-blue">P</span>
-      <span className={size === "xl" ? "text-gray-600" : "text-white"}>ilot</span>
+      <span className={size === "xl" ? "text-gray-600" : "text-white"}>Pilot</span>
       <span className="text-gray-500 font-normal" style={{ fontSize: "0.6em" }}>.com</span>
     </span>
   );
