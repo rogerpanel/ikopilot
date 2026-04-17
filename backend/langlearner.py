@@ -304,6 +304,75 @@ EXERCISE_BANK = {
                 {"type": "translation", "direction": "en_to_ru", "sentence": "Sorry / Excuse me", "answer": "Извините", "alternatives": ["Простите"], "explanation": "Извините = Sorry/Excuse me (formal)."},
                 {"type": "translation", "direction": "ru_to_en", "sentence": "Спасибо большое", "answer": "Thank you very much", "alternatives": ["Thanks a lot", "Many thanks"], "explanation": "Большое = big/great. Literally 'big thank you'."},
             ],
+            "1-3": [
+                {"type": "multiple_choice", "question": "What sound does К make?", "options": ["k", "g", "h", "j"], "correct": 0, "explanation": "К makes the 'k' sound, same as English K."},
+                {"type": "multiple_choice", "question": "Which letter makes the 'l' sound?", "options": ["П", "Р", "Л", "М"], "correct": 2, "explanation": "Л (el) = 'l' sound."},
+                {"type": "matching", "instruction": "Match the consonant to its sound", "pairs": [["К", "k"], ["Л", "l"], ["М", "m"], ["Н", "n"], ["П", "p"]]},
+                {"type": "fill_blank", "sentence": "The Russian letter ___ makes the 'r' sound (rolled)", "answer": "Р", "hint": "Looks like English P but sounds like a rolled R"},
+                {"type": "multiple_choice", "question": "Russian Р sounds like:", "options": ["English P", "English R (rolled)", "English B", "English D"], "correct": 1, "explanation": "Р looks like P but is a rolled R!"},
+            ],
+            "1-4": [
+                {"type": "multiple_choice", "question": "What does Ь (soft sign) do?", "options": ["Makes the previous consonant soft", "Is silent", "Makes a vowel sound", "Doubles the consonant"], "correct": 0, "explanation": "Ь softens the preceding consonant. It has no sound of its own."},
+                {"type": "multiple_choice", "question": "Which letter is the hard sign?", "options": ["Ь", "Ъ", "Щ", "Ц"], "correct": 1, "explanation": "Ъ is the hard sign. Ь is the soft sign."},
+                {"type": "multiple_choice", "question": "What sound does Ш make?", "options": ["sh", "ch", "zh", "ts"], "correct": 0, "explanation": "Ш = 'sh' as in 'shoe'."},
+                {"type": "matching", "instruction": "Match special letters", "pairs": [["Ш", "sh"], ["Щ", "shch"], ["Ц", "ts"], ["Ч", "ch"], ["Ё", "yo"]]},
+                {"type": "fill_blank", "sentence": "The letter ___ sounds like 'ch' in 'cheese'", "answer": "Ч", "hint": "It looks a bit like the number 4"},
+            ],
+            "1-5": [
+                {"type": "multiple_choice", "question": "How do you read 'мама'?", "options": ["mama", "papa", "baba", "dada"], "correct": 0, "explanation": "М=m, А=a, М=m, А=a → mama (mother)."},
+                {"type": "translation", "direction": "ru_to_en", "sentence": "молоко", "answer": "milk", "explanation": "М-О-Л-О-К-О = mo-lo-ko = milk."},
+                {"type": "translation", "direction": "ru_to_en", "sentence": "кот", "answer": "cat", "alternatives": ["male cat"], "explanation": "К-О-Т = kot = cat (male)."},
+                {"type": "fill_blank", "sentence": "The Russian word 'дом' means ___", "answer": "house", "hint": "Д=d, О=o, М=m", "alternatives": ["home"]},
+                {"type": "multiple_choice", "question": "What does 'нет' mean?", "options": ["Yes", "No", "Maybe", "Hello"], "correct": 1, "explanation": "Нет = No. Да = Yes."},
+            ],
+            "2-3": [
+                {"type": "translation", "direction": "en_to_ru", "sentence": "How are you? (informal)", "answer": "Как дела?", "alternatives": ["Как дела"], "explanation": "Как дела? = How are things? (informal)"},
+                {"type": "multiple_choice", "question": "Someone asks 'Как дела?' You reply:", "options": ["Хорошо, спасибо!", "До свидания!", "Меня зовут...", "Пожалуйста!"], "correct": 0, "explanation": "Хорошо, спасибо! = Good, thanks!"},
+                {"type": "multiple_choice", "question": "'Так себе' means:", "options": ["Great", "So-so", "Terrible", "Excellent"], "correct": 1, "explanation": "Так себе = so-so / not great, not bad."},
+                {"type": "sentence_build", "words": ["дела", "Как", "?"], "correct_order": [1, 0, 2], "translation": "How are you?"},
+                {"type": "matching", "instruction": "Match the response", "pairs": [["Хорошо", "Good"], ["Плохо", "Bad"], ["Отлично", "Excellent"], ["Так себе", "So-so"], ["Нормально", "OK"]]},
+            ],
+            "2-4": [
+                {"type": "translation", "direction": "en_to_ru", "sentence": "Nice to meet you", "answer": "Очень приятно", "alternatives": ["Приятно познакомиться"], "explanation": "Очень приятно = Very pleasant (nice to meet you)."},
+                {"type": "multiple_choice", "question": "How do you say 'And you?' in Russian?", "options": ["А вы?", "И ты?", "Но мы?", "Или они?"], "correct": 0, "explanation": "А вы? = And you? (formal). А ты? = And you? (informal)."},
+                {"type": "fill_blank", "sentence": "Очень ___ (Nice to meet you)", "answer": "приятно", "hint": "Means 'pleasant'"},
+                {"type": "sentence_build", "words": ["приятно", "Очень", "познакомиться"], "correct_order": [1, 0, 2], "translation": "Nice to meet you"},
+            ],
+            "3-2": [
+                {"type": "matching", "instruction": "Match the number", "pairs": [["11", "одиннадцать"], ["20", "двадцать"], ["30", "тридцать"], ["50", "пятьдесят"], ["100", "сто"]]},
+                {"type": "multiple_choice", "question": "What is 'двадцать' in English?", "options": ["12", "20", "22", "200"], "correct": 1, "explanation": "Двадцать = 20 (twenty)."},
+                {"type": "fill_blank", "sentence": "The Russian word for 100 is ___", "answer": "сто", "hint": "Very short word — just 3 letters"},
+                {"type": "multiple_choice", "question": "How do you say 15 in Russian?", "options": ["пятнадцать", "пятьдесят", "пять", "двенадцать"], "correct": 0, "explanation": "Пятнадцать = 15. Пятьдесят = 50."},
+                {"type": "translation", "direction": "ru_to_en", "sentence": "тридцать три", "answer": "33", "alternatives": ["thirty-three", "thirty three"], "explanation": "Тридцать (30) + три (3) = 33."},
+            ],
+            "3-3": [
+                {"type": "multiple_choice", "question": "How do you say 'What time is it?' in Russian?", "options": ["Который час?", "Сколько лет?", "Как дела?", "Где ты?"], "correct": 0, "explanation": "Который час? = What time is it? (literally: which hour?)"},
+                {"type": "translation", "direction": "ru_to_en", "sentence": "три часа", "answer": "three o'clock", "alternatives": ["3 o'clock", "3:00"], "explanation": "Три часа = three hours / three o'clock."},
+                {"type": "fill_blank", "sentence": "Сейчас ___ часов (It is now 5 o'clock)", "answer": "пять", "hint": "The number 5"},
+                {"type": "matching", "instruction": "Match times", "pairs": [["час", "1 o'clock"], ["два часа", "2 o'clock"], ["пять часов", "5 o'clock"], ["полдень", "noon"], ["полночь", "midnight"]]},
+            ],
+            "4-2": [
+                {"type": "translation", "direction": "en_to_ru", "sentence": "Yes", "answer": "Да", "explanation": "Да = Yes. One of the first words to learn!"},
+                {"type": "translation", "direction": "en_to_ru", "sentence": "No", "answer": "Нет", "explanation": "Нет = No."},
+                {"type": "multiple_choice", "question": "How do you say 'I don't understand' in Russian?", "options": ["Я не понимаю", "Я понимаю", "Я не знаю", "Я знаю"], "correct": 0, "explanation": "Я не понимаю = I don't understand. Не = not."},
+                {"type": "fill_blank", "sentence": "Я не ___ (I don't know)", "answer": "знаю", "hint": "The verb 'to know' in first person"},
+                {"type": "sentence_build", "words": ["понимаю", "не", "Я"], "correct_order": [2, 1, 0], "translation": "I don't understand"},
+            ],
+            "4-3": [
+                {"type": "translation", "direction": "en_to_ru", "sentence": "Where is...?", "answer": "Где...?", "alternatives": ["Где"], "explanation": "Где = Where. Где туалет? = Where is the toilet?"},
+                {"type": "multiple_choice", "question": "How do you ask 'How much?' in Russian?", "options": ["Сколько?", "Где?", "Когда?", "Почему?"], "correct": 0, "explanation": "Сколько? = How much? / How many?"},
+                {"type": "matching", "instruction": "Match question words", "pairs": [["Где?", "Where?"], ["Сколько?", "How much?"], ["Когда?", "When?"], ["Почему?", "Why?"], ["Что?", "What?"]]},
+                {"type": "fill_blank", "sentence": "___ стоит? (How much does it cost?)", "answer": "Сколько", "hint": "The question word for 'how much'"},
+                {"type": "translation", "direction": "ru_to_en", "sentence": "Где метро?", "answer": "Where is the metro?", "alternatives": ["Where is the subway?", "Where's the metro?"], "explanation": "Где = where, метро = metro/subway."},
+            ],
+            "4-4": [
+                {"type": "multiple_choice", "question": "At a café, how do you say 'I would like...'?", "options": ["Я хотел бы...", "Я хочу...", "Дайте мне...", "Можно..."], "correct": 0, "explanation": "Я хотел бы = I would like (polite). Дайте мне = Give me (direct)."},
+                {"type": "translation", "direction": "en_to_ru", "sentence": "Coffee, please", "answer": "Кофе, пожалуйста", "explanation": "Кофе = coffee, пожалуйста = please."},
+                {"type": "translation", "direction": "en_to_ru", "sentence": "The bill, please", "answer": "Счёт, пожалуйста", "alternatives": ["Счет, пожалуйста"], "explanation": "Счёт = bill/check at a restaurant."},
+                {"type": "matching", "instruction": "Match café vocabulary", "pairs": [["чай", "tea"], ["кофе", "coffee"], ["вода", "water"], ["хлеб", "bread"], ["молоко", "milk"]]},
+                {"type": "sentence_build", "words": ["пожалуйста", "Кофе", ","], "correct_order": [1, 2, 0], "translation": "Coffee, please"},
+                {"type": "fill_blank", "sentence": "Можно ___, пожалуйста? (Can I have water, please?)", "answer": "воду", "hint": "The accusative case of 'вода' (water)"},
+            ],
         }
     }
 }
@@ -370,14 +439,29 @@ async def get_exercises(
             language, level, unit_id, lesson_id,
             lesson["title"], lesson["type"], 5, "deepseek"
         )
-        if not exercises:
-            raise HTTPException(status_code=502, detail="Failed to generate exercises")
-        return {"exercises": exercises, "source": "llm"}
-    except HTTPException:
-        raise
+        if exercises:
+            return {"exercises": exercises, "source": "llm"}
     except Exception as e:
-        logger.error("Exercise generation failed: %s", e)
-        raise HTTPException(status_code=502, detail="Failed to generate exercises")
+        logger.warning("LLM exercise generation unavailable: %s", e)
+
+    # Graceful fallback: generate basic exercises from the lesson metadata
+    fallback = [
+        {
+            "type": "multiple_choice",
+            "question": f"This is a {lesson['type']} lesson: {lesson['title']}. Which CEFR level is this?",
+            "options": ["A1", "A2", "B1", "B2"],
+            "correct": ["A1", "A2", "B1", "B2", "C1"].index(level) if level in ["A1", "A2", "B1", "B2"] else 0,
+            "explanation": f"This lesson is at {level} ({CURRICULUM[language]['levels'][level]['name']}) level.",
+        },
+        {
+            "type": "fill_blank",
+            "sentence": f"Complete the exercise for: {lesson['title']}. Type the lesson type: ___",
+            "answer": lesson["type"],
+            "hint": f"The lesson type is '{lesson['type']}'",
+            "explanation": "LLM-generated exercises are unavailable. Contact admin to configure an API key.",
+        },
+    ]
+    return {"exercises": fallback, "source": "fallback", "note": "LLM unavailable — showing basic exercises. Full exercises require an active LLM API key."}
 
 
 @router.post("/progress/{language}/update")
