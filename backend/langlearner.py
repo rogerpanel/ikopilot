@@ -753,6 +753,100 @@ EXERCISE_BANK = {
             ],
         },
     },
+    "french": {
+        "A1": {
+            "1-1": [
+                {"type": "multiple_choice", "question": "How do you say 'Hello' in French?", "options": ["Bonjour", "Au revoir", "Merci", "S'il vous plaît"], "correct": 0, "explanation": "Bonjour = Hello/Good day. Au revoir = Goodbye."},
+                {"type": "translation", "direction": "fr_to_en", "sentence": "Au revoir", "answer": "Goodbye", "alternatives": ["See you", "Bye"], "explanation": "Au revoir = Goodbye (formal)."},
+                {"type": "matching", "instruction": "Match greetings", "pairs": [["Bonjour", "Hello"], ["Bonsoir", "Good evening"], ["Bonne nuit", "Good night"], ["Salut", "Hi/Bye (informal)"], ["Au revoir", "Goodbye"]]},
+                {"type": "fill_blank", "sentence": "___! Comment allez-vous? (Hello! How are you?)", "answer": "Bonjour", "hint": "The standard French greeting"},
+            ],
+            "1-2": [
+                {"type": "translation", "direction": "en_to_fr", "sentence": "My name is Marie", "answer": "Je m'appelle Marie", "explanation": "Je m'appelle... = My name is... (literally 'I call myself...')."},
+                {"type": "fill_blank", "sentence": "Je ___ Pierre (My name is Pierre)", "answer": "m'appelle", "hint": "Reflexive verb 's'appeler' in je-form"},
+                {"type": "sentence_build", "words": ["m'appelle", "Marie", "Je"], "correct_order": [2, 0, 1], "translation": "My name is Marie"},
+                {"type": "multiple_choice", "question": "'Comment vous appelez-vous?' means:", "options": ["What is your name? (formal)", "How are you?", "Where are you from?", "How old are you?"], "correct": 0, "explanation": "Comment vous appelez-vous? = What is your name? (formal)."},
+            ],
+            "1-3": [
+                {"type": "matching", "instruction": "Match responses", "pairs": [["Très bien", "Very well"], ["Bien", "Good"], ["Comme ci, comme ça", "So-so"], ["Mal", "Bad"], ["Pas mal", "Not bad"]]},
+                {"type": "translation", "direction": "fr_to_en", "sentence": "Ça va bien, merci", "answer": "I'm fine, thank you", "alternatives": ["It's going well, thanks"], "explanation": "Ça va bien = It's going well. Merci = thank you."},
+                {"type": "fill_blank", "sentence": "Comment ___-vous? (How are you? — formal)", "answer": "allez", "hint": "The verb 'aller' (to go) in vous-form"},
+            ],
+            "2-1": [
+                {"type": "multiple_choice", "question": "Which article is masculine singular?", "options": ["le", "la", "les", "l'"], "correct": 0, "explanation": "Le = masculine, la = feminine, les = plural, l' = before vowels."},
+                {"type": "matching", "instruction": "Match the article", "pairs": [["le garçon", "the boy"], ["la fille", "the girl"], ["les enfants", "the children"], ["l'homme", "the man"], ["l'eau", "the water"]]},
+                {"type": "fill_blank", "sentence": "___ chat est noir (The cat is black — chat is masculine)", "answer": "Le", "hint": "Masculine singular article"},
+            ],
+            "2-2": [
+                {"type": "multiple_choice", "question": "'Un' is:", "options": ["Masculine indefinite article (a/an)", "Feminine indefinite article", "Plural article", "Definite article"], "correct": 0, "explanation": "Un = a (masculine), une = a (feminine), des = some (plural)."},
+                {"type": "matching", "instruction": "Match indefinite articles", "pairs": [["un livre", "a book"], ["une maison", "a house"], ["des amis", "some friends"], ["un chat", "a cat"], ["une école", "a school"]]},
+                {"type": "fill_blank", "sentence": "J'ai ___ sœur (I have a sister — sœur is feminine)", "answer": "une", "hint": "Feminine indefinite article"},
+            ],
+            "3-1": [
+                {"type": "matching", "instruction": "Match numbers", "pairs": [["un", "1"], ["deux", "2"], ["trois", "3"], ["quatre", "4"], ["cinq", "5"]]},
+                {"type": "matching", "instruction": "Match numbers 6-10", "pairs": [["six", "6"], ["sept", "7"], ["huit", "8"], ["neuf", "9"], ["dix", "10"]]},
+                {"type": "fill_blank", "sentence": "Cinq plus cinq font ___", "answer": "dix", "hint": "5 + 5 = ?"},
+                {"type": "translation", "direction": "fr_to_en", "sentence": "vingt", "answer": "twenty", "alternatives": ["20"], "explanation": "Vingt = 20."},
+            ],
+            "3-2": [
+                {"type": "translation", "direction": "en_to_fr", "sentence": "Please", "answer": "S'il vous plaît", "alternatives": ["S'il te plaît"], "explanation": "S'il vous plaît (formal) / S'il te plaît (informal) = Please."},
+                {"type": "matching", "instruction": "Match polite phrases", "pairs": [["Merci", "Thank you"], ["S'il vous plaît", "Please"], ["Excusez-moi", "Excuse me"], ["Pardon", "Sorry"], ["De rien", "You're welcome"]]},
+                {"type": "fill_blank", "sentence": "Merci ___! (Thank you very much!)", "answer": "beaucoup", "hint": "The French word for 'a lot/much'"},
+            ],
+            "3-3": [
+                {"type": "translation", "direction": "en_to_fr", "sentence": "A coffee, please", "answer": "Un café, s'il vous plaît", "alternatives": ["Un café, s'il te plaît"], "explanation": "Un café = a coffee."},
+                {"type": "matching", "instruction": "Match café vocabulary", "pairs": [["un café", "a coffee"], ["un thé", "a tea"], ["un croissant", "a croissant"], ["l'addition", "the bill"], ["de l'eau", "some water"]]},
+                {"type": "fill_blank", "sentence": "L'___, s'il vous plaît (The bill, please)", "answer": "addition", "hint": "The French word for 'bill' at a restaurant"},
+            ],
+        },
+    },
+    "spanish": {
+        "A1": {
+            "1-1": [
+                {"type": "multiple_choice", "question": "How do you say 'Hello' in Spanish?", "options": ["Hola", "Adiós", "Gracias", "Por favor"], "correct": 0, "explanation": "Hola = Hello. Adiós = Goodbye. Gracias = Thanks."},
+                {"type": "translation", "direction": "es_to_en", "sentence": "Buenos días", "answer": "Good morning", "alternatives": ["Good day"], "explanation": "Buenos días = Good morning/day."},
+                {"type": "matching", "instruction": "Match greetings", "pairs": [["Buenos días", "Good morning"], ["Buenas tardes", "Good afternoon"], ["Buenas noches", "Good evening/night"], ["Hola", "Hello"], ["Adiós", "Goodbye"]]},
+                {"type": "fill_blank", "sentence": "¡___! ¿Cómo estás? (Hello! How are you?)", "answer": "Hola", "hint": "The most common Spanish greeting"},
+            ],
+            "1-2": [
+                {"type": "translation", "direction": "en_to_es", "sentence": "My name is Carlos", "answer": "Me llamo Carlos", "alternatives": ["Mi nombre es Carlos"], "explanation": "Me llamo... = My name is... (literally 'I call myself...')."},
+                {"type": "fill_blank", "sentence": "Me ___ María (My name is María)", "answer": "llamo", "hint": "The verb 'llamarse' in yo-form"},
+                {"type": "sentence_build", "words": ["llamo", "Carlos", "Me"], "correct_order": [2, 0, 1], "translation": "My name is Carlos"},
+                {"type": "multiple_choice", "question": "'¿Cómo te llamas?' means:", "options": ["What's your name? (informal)", "How are you?", "Where are you from?", "How old are you?"], "correct": 0, "explanation": "¿Cómo te llamas? = What's your name? (informal)."},
+            ],
+            "1-3": [
+                {"type": "matching", "instruction": "Match responses", "pairs": [["Muy bien", "Very well"], ["Bien", "Good"], ["Regular", "So-so"], ["Mal", "Bad"], ["Más o menos", "More or less"]]},
+                {"type": "translation", "direction": "es_to_en", "sentence": "Estoy bien, gracias", "answer": "I'm fine, thank you", "alternatives": ["I'm good, thanks"], "explanation": "Estoy bien = I'm fine. Gracias = thank you."},
+                {"type": "fill_blank", "sentence": "¿Cómo ___? (How are you? — informal)", "answer": "estás", "hint": "The verb 'estar' in tú-form"},
+            ],
+            "2-1": [
+                {"type": "multiple_choice", "question": "Which article is masculine singular?", "options": ["el", "la", "los", "las"], "correct": 0, "explanation": "El = masculine singular, la = feminine singular, los = masculine plural, las = feminine plural."},
+                {"type": "matching", "instruction": "Match articles", "pairs": [["el libro", "the book"], ["la casa", "the house"], ["los niños", "the children (m)"], ["las mujeres", "the women"], ["el agua", "the water"]]},
+                {"type": "fill_blank", "sentence": "___ gato es negro (The cat is black — gato is masculine)", "answer": "El", "hint": "Masculine singular definite article"},
+            ],
+            "2-2": [
+                {"type": "multiple_choice", "question": "'Un' is:", "options": ["Masculine indefinite article", "Feminine indefinite article", "Definite article", "Plural article"], "correct": 0, "explanation": "Un = a (masculine), una = a (feminine), unos/unas = some (plural)."},
+                {"type": "matching", "instruction": "Match indefinite articles", "pairs": [["un libro", "a book"], ["una casa", "a house"], ["unos amigos", "some friends (m)"], ["unas flores", "some flowers"], ["un perro", "a dog"]]},
+                {"type": "fill_blank", "sentence": "Tengo ___ hermana (I have a sister — hermana is feminine)", "answer": "una", "hint": "Feminine indefinite article"},
+            ],
+            "3-1": [
+                {"type": "matching", "instruction": "Match numbers", "pairs": [["uno", "1"], ["dos", "2"], ["tres", "3"], ["cuatro", "4"], ["cinco", "5"]]},
+                {"type": "matching", "instruction": "Match numbers 6-10", "pairs": [["seis", "6"], ["siete", "7"], ["ocho", "8"], ["nueve", "9"], ["diez", "10"]]},
+                {"type": "fill_blank", "sentence": "Cinco más cinco son ___", "answer": "diez", "hint": "5 + 5 = ?"},
+                {"type": "translation", "direction": "es_to_en", "sentence": "veinte", "answer": "twenty", "alternatives": ["20"], "explanation": "Veinte = 20."},
+            ],
+            "3-2": [
+                {"type": "translation", "direction": "en_to_es", "sentence": "Please", "answer": "Por favor", "explanation": "Por favor = Please."},
+                {"type": "matching", "instruction": "Match polite phrases", "pairs": [["Gracias", "Thank you"], ["Por favor", "Please"], ["Perdón", "Sorry"], ["Disculpe", "Excuse me"], ["De nada", "You're welcome"]]},
+                {"type": "fill_blank", "sentence": "Muchas ___! (Thank you very much!)", "answer": "gracias", "hint": "The Spanish word for 'thanks'"},
+            ],
+            "3-3": [
+                {"type": "translation", "direction": "en_to_es", "sentence": "A coffee, please", "answer": "Un café, por favor", "explanation": "Un café = a coffee. Por favor = please."},
+                {"type": "matching", "instruction": "Match café vocabulary", "pairs": [["un café", "a coffee"], ["un té", "a tea"], ["agua", "water"], ["la cuenta", "the bill"], ["un zumo", "a juice"]]},
+                {"type": "fill_blank", "sentence": "La ___, por favor (The bill, please)", "answer": "cuenta", "hint": "The Spanish word for 'bill' at a restaurant"},
+            ],
+        },
+    },
 }
 
 
