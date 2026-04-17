@@ -23,6 +23,7 @@ import {
   BookOpenCheck,
   BookMarked,
   Languages,
+  FlaskConical,
 } from "lucide-react";
 import { clearAuth, getStoredUser, isAdmin } from "../utils/auth";
 import Logo from "./Logo";
@@ -73,6 +74,7 @@ export default function Layout() {
         { to: "/humanizer", label: "iKo Writer", icon: PenTool },
         { to: "/framework", label: "iKo Framework", icon: LayoutDashboard },
         { to: "/doc-handler", label: "iKo Doc-Handler", icon: Files },
+        { to: "/datalab", label: "iKo DataLab", icon: FlaskConical },
       ],
     },
     {
