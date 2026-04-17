@@ -188,6 +188,27 @@ class Payment(Base):
     user = relationship("User")
 
 
+class LangProgress(Base):
+    __tablename__ = "lang_progress"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    language = Column(String(20), nullable=False, default="russian")
+    level = Column(String(5), nullable=False, default="A1")
+    unit = Column(Integer, default=1)
+    lesson = Column(Integer, default=1)
+    xp = Column(Integer, default=0)
+    streak_days = Column(Integer, default=0)
+    exercises_completed = Column(Integer, default=0)
+    exercises_correct = Column(Integer, default=0)
+    last_activity = Column(DateTime(timezone=True), default=utcnow)
+    placement_done = Column(Boolean, default=False)
+    completed_lessons = Column(JSON, default=list)
+    created_at = Column(DateTime(timezone=True), default=utcnow)
+
+    user = relationship("User")
+
+
 # ---------- Session helper ----------
 
 async def get_db():

@@ -22,6 +22,7 @@ import {
   HelpCircle,
   BookOpenCheck,
   BookMarked,
+  Languages,
 } from "lucide-react";
 import { clearAuth, getStoredUser, isAdmin } from "../utils/auth";
 import Logo from "./Logo";
@@ -60,6 +61,7 @@ export default function Layout() {
         { to: "/projects", label: "iKo Projects", icon: FolderKanban },
         { to: "/lit-review", label: "iKo Lit-Review", icon: BookOpenCheck },
         { to: "/journal", label: "iKo Journal", icon: BookMarked },
+        { to: "/lang-learner", label: "iKo LangLearner", icon: Languages },
       ],
     },
   ];
