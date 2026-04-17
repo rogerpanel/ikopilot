@@ -46,7 +46,7 @@ router = APIRouter(prefix="/api/datalab", tags=["datalab"])
 # In-memory session storage for uploaded datasets (keyed by user_id)
 _datasets: dict[int, dict] = {}
 
-MAX_UPLOAD_SIZE = 50 * 1024 * 1024  # 50 MB
+MAX_UPLOAD_SIZE = 150 * 1024 * 1024  # 150 MB
 MAX_ROWS_DISPLAY = 500
 
 
@@ -94,7 +94,7 @@ async def upload_data(
 
     data = await file.read()
     if len(data) > MAX_UPLOAD_SIZE:
-        raise HTTPException(status_code=400, detail="File too large. Maximum 50 MB.")
+        raise HTTPException(status_code=400, detail="File too large. Maximum 150 MB.")
 
     try:
         if ext == "csv":
@@ -551,3 +551,149 @@ async def get_columns(user: User = Depends(get_current_user)):
             col_type = "categorical"
         columns.append({"name": col, "type": col_type, "dtype": str(df[col].dtype)})
     return {"columns": columns, "rows": len(df)}
+
+
+# ---------- Export Results ----------
+
+class ExportResultsRequest(BaseModel):
+    title: str = "DataLab Analysis Report"
+    sections: list[dict] = []  # [{"heading": "...", "content": "...", "chart": "base64..."}]
+    format: str = "pdf"  # pdf | docx | png
+
+
+@router.post("/export")
+async def export_results(req: ExportResultsRequest, user: User = Depends(get_current_user)):
+    """Export analysis results as PDF, DOCX, or PNG report."""
+    if req.format == "docx":
+        return _export_docx_report(req)
+    elif req.format == "png":
+        return _export_png_report(req)
+    else:
+        return _export_pdf_report(req)
+
+
+def _export_pdf_report(req: ExportResultsRequest) -> Response:
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import inch
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image as RLImage
+    from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
+
+    buf = io.BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=A4, leftMargin=inch, rightMargin=inch, topMargin=inch, bottomMargin=inch)
+    styles = getSampleStyleSheet()
+    styles.add(ParagraphStyle(name="RTitle", parent=styles["Title"], fontSize=18, spaceAfter=20, alignment=TA_CENTER))
+    styles.add(ParagraphStyle(name="RBody", parent=styles["Normal"], fontSize=11, leading=15, spaceAfter=8, alignment=TA_JUSTIFY))
+    styles.add(ParagraphStyle(name="RH1", parent=styles["Heading1"], fontSize=14, spaceBefore=16, spaceAfter=8))
+
+    story = [Paragraph(req.title.replace("&", "&amp;"), styles["RTitle"]), Spacer(1, 12)]
+
+    for section in req.sections:
+        if section.get("heading"):
+            story.append(Paragraph(section["heading"].replace("&", "&amp;"), styles["RH1"]))
+        if section.get("content"):
+            for line in section["content"].split("\n"):
+                line = line.strip()
+                if line:
+                    safe = line.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+                    safe = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", safe)
+                    story.append(Paragraph(safe, styles["RBody"]))
+            story.append(Spacer(1, 6))
+        if section.get("chart"):
+            try:
+                img_data = base64.b64decode(section["chart"])
+                img_buf = io.BytesIO(img_data)
+                img = RLImage(img_buf, width=5.5 * inch, height=3.5 * inch)
+                story.append(img)
+                story.append(Spacer(1, 12))
+            except Exception:
+                pass
+
+    doc.build(story)
+    buf.seek(0)
+    fname = re.sub(r"[^a-zA-Z0-9_\- ]", "", req.title).replace(" ", "_")[:50]
+    return Response(content=buf.getvalue(), media_type="application/pdf",
+                    headers={"Content-Disposition": f'attachment; filename="{fname}.pdf"'})
+
+
+def _export_docx_report(req: ExportResultsRequest) -> Response:
+    from docx import Document
+    from docx.shared import Pt, Inches
+    from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+
+    doc = Document()
+    style = doc.styles["Normal"]
+    style.font.name = "Times New Roman"
+    style.font.size = Pt(12)
+    style.paragraph_format.line_spacing = 1.5
+
+    t = doc.add_heading(req.title, level=0)
+    t.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
+    for section in req.sections:
+        if section.get("heading"):
+            doc.add_heading(section["heading"], level=1)
+        if section.get("content"):
+            for line in section["content"].split("\n"):
+                line = line.strip()
+                if line:
+                    para = doc.add_paragraph()
+                    parts = re.split(r"(\*\*.*?\*\*)", line)
+                    for part in parts:
+                        if part.startswith("**") and part.endswith("**"):
+                            run = para.add_run(part[2:-2])
+                            run.bold = True
+                        else:
+                            para.add_run(part)
+        if section.get("chart"):
+            try:
+                img_data = base64.b64decode(section["chart"])
+                img_buf = io.BytesIO(img_data)
+                doc.add_picture(img_buf, width=Inches(5.5))
+            except Exception:
+                pass
+
+    buf = io.BytesIO()
+    doc.save(buf)
+    buf.seek(0)
+    fname = re.sub(r"[^a-zA-Z0-9_\- ]", "", req.title).replace(" ", "_")[:50]
+    return Response(content=buf.getvalue(),
+                    media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    headers={"Content-Disposition": f'attachment; filename="{fname}.docx"'})
+
+
+def _export_png_report(req: ExportResultsRequest) -> Response:
+    """Combine all charts into a single tall PNG."""
+    charts = [s.get("chart") for s in req.sections if s.get("chart")]
+    if not charts:
+        raise HTTPException(status_code=400, detail="No charts to export")
+
+    from PIL import Image as PILImage
+
+    images = []
+    for chart_b64 in charts:
+        try:
+            img_data = base64.b64decode(chart_b64)
+            img = PILImage.open(io.BytesIO(img_data))
+            images.append(img)
+        except Exception:
+            continue
+
+    if not images:
+        raise HTTPException(status_code=400, detail="Could not decode chart images")
+
+    total_height = sum(img.height for img in images) + 20 * (len(images) - 1)
+    max_width = max(img.width for img in images)
+    combined = PILImage.new("RGB", (max_width, total_height), color=(17, 24, 39))
+
+    y_offset = 0
+    for img in images:
+        combined.paste(img, (0, y_offset))
+        y_offset += img.height + 20
+
+    buf = io.BytesIO()
+    combined.save(buf, format="PNG")
+    buf.seek(0)
+    fname = re.sub(r"[^a-zA-Z0-9_\- ]", "", req.title).replace(" ", "_")[:50]
+    return Response(content=buf.getvalue(), media_type="image/png",
+                    headers={"Content-Disposition": f'attachment; filename="{fname}.png"'})

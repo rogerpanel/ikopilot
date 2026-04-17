@@ -14,6 +14,7 @@ import {
   Paperclip,
   FileText,
   Image,
+  Download,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import toast from "react-hot-toast";
@@ -211,6 +212,23 @@ export default function Chat() {
     }
   };
 
+  const handleExportChat = () => {
+    if (!messages || messages.length === 0) { toast.error("No messages to export"); return; }
+    let md = `# Chat Conversation\n\n`;
+    messages.forEach((m: any) => {
+      const role = m.role === "user" ? "**You**" : "**iKoPilot.com**";
+      md += `${role}:\n${m.content}\n\n---\n\n`;
+    });
+    const blob = new Blob([md], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "chat_conversation.md";
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Chat exported as Markdown");
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -352,6 +370,10 @@ export default function Chat() {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Export chat */}
+            <button onClick={handleExportChat} className="flex items-center gap-1 text-xs text-gray-400 hover:text-white bg-dark-700 border border-dark-500 rounded-lg px-2 py-1 transition-colors" title="Export chat">
+              <Download size={12} /> Export
+            </button>
             {/* Scholar search toggle */}
             <button
               onClick={() => setShowTools(!showTools)}

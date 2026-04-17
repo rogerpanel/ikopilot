@@ -9,21 +9,33 @@ import { apiPost, apiFetch } from "../utils/api";
 
 const API_BASE = import.meta.env.VITE_API_URL || "";
 
+function saveState(key: string, value: any) {
+  try { sessionStorage.setItem(`datalab_${key}`, JSON.stringify(value)); } catch {}
+}
+function loadState<T>(key: string, fallback: T): T {
+  try { const v = sessionStorage.getItem(`datalab_${key}`); return v ? JSON.parse(v) : fallback; } catch { return fallback; }
+}
+
 interface ColInfo { name: string; type: string; dtype: string; missing: number; unique: number; }
 
 export default function DataLab() {
-  const [tab, setTab] = useState<"upload"|"explore"|"visualize"|"analyze"|"ml">("upload");
+  const [tab, setTab] = useState<"upload"|"explore"|"visualize"|"analyze"|"ml">(loadState("tab", "upload"));
   const [uploading, setUploading] = useState(false);
-  const [dataset, setDataset] = useState<{ filename: string; rows: number; columns: ColInfo[]; preview: any[] } | null>(null);
+  const [dataset, setDataset] = useState<{ filename: string; rows: number; columns: ColInfo[]; preview: any[] } | null>(loadState("dataset", null));
   const [loading, setLoading] = useState(false);
-  const [summary, setSummary] = useState<any>(null);
-  const [corrChart, setCorrChart] = useState("");
-  const [chartImg, setChartImg] = useState("");
-  const [statsResult, setStatsResult] = useState<any>(null);
-  const [mlResult, setMlResult] = useState<any>(null);
-  const [interpretation, setInterpretation] = useState("");
+  const [summary, setSummary] = useState<any>(loadState("summary", null));
+  const [corrChart, setCorrChart] = useState(loadState("corrChart", ""));
+  const [chartImg, setChartImg] = useState(loadState("chartImg", ""));
+  const [statsResult, setStatsResult] = useState<any>(loadState("statsResult", null));
+  const [mlResult, setMlResult] = useState<any>(loadState("mlResult", null));
+  const [interpretation, setInterpretation] = useState(loadState("interpretation", ""));
   const [interpreting, setInterpreting] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const [exporting, setExporting] = useState("");
+
+  // Persist state across navigation
+  const saveTab = (t: any) => { setTab(t); saveState("tab", t); };
+  const updateAndSave = (setter: any, key: string) => (val: any) => { setter(val); saveState(key, val); };
 
   // Viz state
   const [chartType, setChartType] = useState("histogram");
@@ -40,6 +52,37 @@ export default function DataLab() {
   const [targetCol, setTargetCol] = useState("");
   const [mlModel, setMlModel] = useState("random_forest");
   const [nClusters, setNClusters] = useState(3);
+
+  const handleExport = async (format: string) => {
+    setExporting(format);
+    try {
+      const sections: any[] = [];
+      if (summary) sections.push({ heading: "Data Summary", content: `Rows: ${summary.shape.rows}\nColumns: ${summary.shape.columns}\nMissing values: ${summary.missing_total} (${summary.missing_pct}%)` });
+      if (corrChart) sections.push({ heading: "Correlation Matrix", chart: corrChart });
+      if (chartImg) sections.push({ heading: "Visualization", chart: chartImg });
+      if (statsResult) sections.push({ heading: `Statistical Test: ${statsResult.test}`, content: Object.entries(statsResult).filter(([k]) => !["test","columns","group_column"].includes(k)).map(([k,v]) => `**${k.replace(/_/g," ")}**: ${v}`).join("\n") });
+      if (mlResult) {
+        sections.push({ heading: `ML: ${mlResult.task}`, content: Object.entries(mlResult).filter(([k]) => !["task","features","chart","feature_importances","loadings","classes","cluster_sizes","explained_variance"].includes(k)).map(([k,v]) => `**${k.replace(/_/g," ")}**: ${typeof v === "number" ? (v as number).toFixed(4) : v}`).join("\n") });
+        if (mlResult.chart) sections.push({ heading: "ML Visualization", chart: mlResult.chart });
+      }
+      if (interpretation) sections.push({ heading: "AI Interpretation", content: interpretation });
+
+      const token = localStorage.getItem("ikopilot_token");
+      const res = await fetch(`${API_BASE}/api/datalab/export`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: JSON.stringify({ title: `DataLab Report — ${dataset?.filename || "Analysis"}`, sections, format }),
+      });
+      if (!res.ok) throw new Error("Export failed");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a"); a.href = url;
+      a.download = `datalab_report.${format === "docx" ? "docx" : format === "png" ? "png" : "pdf"}`;
+      a.click(); URL.revokeObjectURL(url);
+      toast.success(`Exported as ${format.toUpperCase()}`);
+    } catch (err: any) { toast.error(err.message || "Export failed"); }
+    finally { setExporting(""); }
+  };
 
   const numericCols = dataset?.columns.filter(c => c.type === "numeric").map(c => c.name) || [];
   const catCols = dataset?.columns.filter(c => c.type === "categorical").map(c => c.name) || [];
@@ -61,9 +104,10 @@ export default function DataLab() {
       if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.detail || "Upload failed"); }
       const data = await res.json();
       setDataset(data);
+      saveState("dataset", data);
       if (data.columns?.length) { setXCol(data.columns[0].name); if (data.columns.length > 1) setYCol(data.columns[1].name); }
       toast.success(`${data.filename} loaded — ${data.rows} rows, ${data.columns.length} columns`);
-      setTab("explore");
+      saveTab("explore");
     } catch (err: any) { toast.error(err.message); }
     finally { setUploading(false); if (fileRef.current) fileRef.current.value = ""; }
   };
@@ -73,7 +117,9 @@ export default function DataLab() {
     try {
       const [s, c] = await Promise.all([apiFetch("/api/datalab/summary"), apiFetch("/api/datalab/correlations").catch(() => null)]);
       setSummary(s);
+      saveState("summary", s);
       if (c?.chart) setCorrChart(c.chart);
+      if (c?.chart) saveState("corrChart", c.chart);
     } catch (err: any) { toast.error(err.message); }
     finally { setLoading(false); }
   };
@@ -83,6 +129,7 @@ export default function DataLab() {
     try {
       const res = await apiPost("/api/datalab/visualize", { chart_type: chartType, x_column: xCol, y_column: yCol });
       setChartImg(res.chart);
+      saveState("chartImg", res.chart);
     } catch (err: any) { toast.error(err.message); }
     finally { setLoading(false); }
   };
@@ -92,6 +139,7 @@ export default function DataLab() {
     try {
       const res = await apiPost("/api/datalab/stats-test", { test: testType, columns: testCols, group_column: groupCol });
       setStatsResult(res);
+      saveState("statsResult", res);
     } catch (err: any) { toast.error(err.message); }
     finally { setLoading(false); }
   };
@@ -101,6 +149,7 @@ export default function DataLab() {
     try {
       const res = await apiPost("/api/datalab/ml", { task: mlTask, target_column: targetCol, model_type: mlModel, n_clusters: nClusters });
       setMlResult(res);
+      saveState("mlResult", res);
     } catch (err: any) { toast.error(err.message); }
     finally { setLoading(false); }
   };
@@ -110,6 +159,7 @@ export default function DataLab() {
     try {
       const res = await apiPost("/api/datalab/interpret", { context, results, provider: "deepseek" });
       setInterpretation(res.interpretation);
+      saveState("interpretation", res.interpretation);
     } catch { toast.error("Interpretation failed"); }
     finally { setInterpreting(false); }
   };
@@ -134,7 +184,7 @@ export default function DataLab() {
       {/* Tabs */}
       <div className="flex gap-1 px-6 pt-3 border-b border-dark-500/30">
         {tabs.map(t => (
-          <button key={t.id} onClick={() => { if (t.id === "explore" && !summary) loadSummary(); setTab(t.id as any); }}
+          <button key={t.id} onClick={() => { if (t.id === "explore" && !summary) loadSummary(); saveTab(t.id); }}
             disabled={t.id !== "upload" && !dataset}
             className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${tab === t.id ? "border-brand-orange text-brand-orange" : "border-transparent text-gray-500 hover:text-gray-300"} disabled:opacity-30 disabled:cursor-not-allowed`}>
             <t.icon size={14} /> {t.label}
@@ -176,7 +226,7 @@ export default function DataLab() {
                       <tbody>{dataset.preview.slice(0, 5).map((row, i) => <tr key={i} className="border-b border-dark-500/30">{allCols.map(c => <td key={c} className="px-2 py-1 truncate max-w-[120px]">{String(row[c] ?? "")}</td>)}</tr>)}</tbody>
                     </table>
                   </div>
-                  <button onClick={() => { loadSummary(); setTab("explore"); }} className="mt-4 flex items-center gap-2 bg-brand-orange hover:bg-orange-600 text-white px-5 py-2 rounded-lg text-sm font-medium">
+                  <button onClick={() => { loadSummary(); saveTab("explore"); }} className="mt-4 flex items-center gap-2 bg-brand-orange hover:bg-orange-600 text-white px-5 py-2 rounded-lg text-sm font-medium">
                     Explore Data <ChevronRight size={14} />
                   </button>
                 </div>
@@ -400,6 +450,22 @@ export default function DataLab() {
             </div>
           )}
         </div>
+
+        {/* Export bar — shows when any results exist */}
+        {dataset && (summary || chartImg || statsResult || mlResult) && (
+          <div className="border-t border-dark-500/30 bg-dark-800/80 px-6 py-3 flex items-center justify-between">
+            <span className="text-xs text-gray-500">Export all results as a report</span>
+            <div className="flex gap-2">
+              {["pdf", "docx", "png"].map(fmt => (
+                <button key={fmt} onClick={() => handleExport(fmt)} disabled={!!exporting}
+                  className="flex items-center gap-1.5 bg-dark-700 hover:bg-dark-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium border border-dark-500/30 disabled:opacity-50">
+                  {exporting === fmt ? <Loader2 size={12} className="animate-spin" /> : null}
+                  {fmt.toUpperCase()}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

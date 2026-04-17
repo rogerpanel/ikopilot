@@ -15,6 +15,7 @@ import {
   ChevronDown,
   Link2,
   FolderKanban,
+  Download,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { apiPost, apiFetch } from "../utils/api";
@@ -154,6 +155,22 @@ function GapFinder() {
     }
   };
 
+  const handleExportGaps = (gapList: ResearchGap[], topicStr: string) => {
+    let md = `# Research Gap Analysis\n\n**Topic**: ${topicStr}\n\n`;
+    gapList.forEach((g, i) => {
+      md += `## Gap ${i + 1}: ${g.title}\n\n`;
+      md += `- **Description**: ${g.description}\n`;
+      md += `- **Research question**: ${g.research_question}\n`;
+      md += `- **Suggested methodology**: ${g.methodology}\n`;
+      md += `- **Confidence**: ${g.confidence}%\n\n`;
+    });
+    const blob = new Blob([md], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url;
+    a.download = "gap_analysis.md"; a.click(); URL.revokeObjectURL(url);
+    toast.success("Gap analysis exported");
+  };
+
   return (
     <div className="space-y-6">
       {/* Form */}
@@ -279,6 +296,12 @@ function GapFinder() {
               </div>
             ))}
           </div>
+          <button
+            onClick={() => handleExportGaps(gaps, topic)}
+            className="flex items-center gap-1 text-xs text-gray-400 hover:text-white bg-dark-700 border border-dark-500 rounded-lg px-3 py-1.5 transition-colors"
+          >
+            <Download size={12} /> Export Gaps
+          </button>
         </div>
       )}
     </div>
@@ -319,6 +342,25 @@ function DebateMode() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleExportDebate = (debate: DebateResult) => {
+    let md = `# Academic Debate Analysis\n\n**Topic**: ${topic || ""}\n\n`;
+    debate.sides.forEach((side, idx) => {
+      md += `## ${side.paper || `Paper ${idx === 0 ? "A" : "B"}`} Claims\n`;
+      side.claims.forEach((claim) => { md += `- ${claim}\n`; });
+      md += `\n`;
+    });
+    md += `## Points of Agreement\n`;
+    debate.agreements.forEach((p) => { md += `- ${p}\n`; });
+    md += `\n## Contradictions\n`;
+    debate.contradictions.forEach((p) => { md += `- ${p}\n`; });
+    md += `\n## Synthesis\n${debate.synthesis || ""}\n`;
+    const blob = new Blob([md], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url;
+    a.download = "debate_analysis.md"; a.click(); URL.revokeObjectURL(url);
+    toast.success("Debate analysis exported");
   };
 
   return (
@@ -463,6 +505,12 @@ function DebateMode() {
               <p className="text-sm text-gray-300 leading-relaxed">{result.synthesis}</p>
             </div>
           )}
+          <button
+            onClick={() => handleExportDebate(result)}
+            className="flex items-center gap-1 text-xs text-gray-400 hover:text-white bg-dark-700 border border-dark-500 rounded-lg px-3 py-1.5 transition-colors"
+          >
+            <Download size={12} /> Export Debate
+          </button>
         </div>
       )}
     </div>

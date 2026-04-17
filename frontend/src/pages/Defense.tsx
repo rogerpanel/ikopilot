@@ -20,6 +20,7 @@ import {
   ThumbsDown,
   Minus,
   Layout,
+  Download,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { apiPost } from "../utils/api";
@@ -220,6 +221,21 @@ function QuestionGenerator() {
       )
     : null;
 
+  const handleExportQuestions = (questions: DefenseQuestion[], title: string) => {
+    let md = `# Defense Questions\n\n**Thesis**: ${title}\n\n`;
+    questions.forEach((q, i) => {
+      md += `## Q${i + 1} [${q.category}] (${q.difficulty})\n\n`;
+      md += `${q.question}\n\n`;
+      md += `**Answer framework:**\n`;
+      md += `${q.answer_framework}\n\n`;
+    });
+    const blob = new Blob([md], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url;
+    a.download = "defense_questions.md"; a.click(); URL.revokeObjectURL(url);
+    toast.success("Questions exported");
+  };
+
   return (
     <div className="space-y-6">
       {/* Form */}
@@ -346,6 +362,11 @@ function QuestionGenerator() {
       {/* Results grouped by category */}
       {grouped && (
         <div className="space-y-6">
+          <div className="flex justify-end">
+            <button onClick={() => handleExportQuestions(result!.questions, form.thesis_title)} className="flex items-center gap-1 text-xs text-gray-400 hover:text-white bg-dark-700 border border-dark-500 rounded-lg px-3 py-1.5 transition-colors">
+              <Download size={12} /> Export Questions
+            </button>
+          </div>
           {CATEGORIES.map((cat) => {
             const questions = grouped[cat];
             if (questions.length === 0) return null;
@@ -501,6 +522,23 @@ function MockDefense() {
     }
   };
 
+  const handleExportMockDefense = (msgs: MockMessage[]) => {
+    let md = `# Mock Defense Session\n\n**Examiner style**: ${style.replace("_", " ")}\n\n`;
+    msgs.forEach((msg, i) => {
+      const role = msg.role === "user" ? "You" : "Examiner";
+      md += `### ${role} (${i + 1})\n\n`;
+      md += `${msg.content}\n\n`;
+      if (msg.feedback) {
+        md += `> **Feedback** (${msg.quality || "N/A"}): ${msg.feedback}\n\n`;
+      }
+    });
+    const blob = new Blob([md], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url;
+    a.download = "mock_defense.md"; a.click(); URL.revokeObjectURL(url);
+    toast.success("Mock defense exported");
+  };
+
   if (!sessionStarted) {
     return (
       <div className="space-y-6">
@@ -601,15 +639,20 @@ function MockDefense() {
             {style.replace("_", " ")}
           </span>
         </div>
-        <button
-          onClick={() => {
-            setSessionStarted(false);
-            setMessages([]);
-          }}
-          className="text-xs text-gray-400 hover:text-white bg-dark-700 px-3 py-1 rounded-lg transition-colors"
-        >
-          End Session
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={() => handleExportMockDefense(messages)} className="flex items-center gap-1 text-xs text-gray-400 hover:text-white bg-dark-700 border border-dark-500 rounded-lg px-3 py-1.5 transition-colors">
+            <Download size={12} /> Export Session
+          </button>
+          <button
+            onClick={() => {
+              setSessionStarted(false);
+              setMessages([]);
+            }}
+            className="text-xs text-gray-400 hover:text-white bg-dark-700 px-3 py-1 rounded-lg transition-colors"
+          >
+            End Session
+          </button>
+        </div>
       </div>
 
       {/* Chat messages */}
@@ -739,6 +782,23 @@ function PresentationBuilder() {
     }
   };
 
+  const handleExportPresentation = (slides: Slide[], title: string, totalTime: number) => {
+    let md = `# Defense Presentation Outline\n\n**Thesis**: ${title}\n`;
+    md += `**Total slides**: ${slides.length}\n`;
+    md += `**Total time**: ${totalTime} min\n\n`;
+    slides.forEach((slide) => {
+      md += `## Slide ${slide.slide_number}: ${slide.title} (${slide.time_minutes} min)\n\n`;
+      (slide.content || []).forEach((item: string) => { md += `- ${item}\n`; });
+      if (slide.speaker_notes) md += `\n*Speaker notes*: ${slide.speaker_notes}\n`;
+      md += `\n`;
+    });
+    const blob = new Blob([md], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url;
+    a.download = "presentation_outline.md"; a.click(); URL.revokeObjectURL(url);
+    toast.success("Presentation outline exported");
+  };
+
   return (
     <div className="space-y-6">
       {/* Form */}
@@ -850,6 +910,9 @@ function PresentationBuilder() {
                 </span>
               </div>
             </div>
+            <button onClick={() => handleExportPresentation(result.slides, form.thesis_title, result.total_time || result.slides.reduce((s, sl) => s + sl.time_minutes, 0))} className="flex items-center gap-1 text-xs text-gray-400 hover:text-white bg-dark-700 border border-dark-500 rounded-lg px-3 py-1.5 transition-colors">
+              <Download size={12} /> Export Outline
+            </button>
           </div>
 
           {/* Slides */}

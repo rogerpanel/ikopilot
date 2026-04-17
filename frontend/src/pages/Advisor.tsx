@@ -14,6 +14,7 @@ import {
   X,
   FileText,
   Image,
+  Download,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import toast from "react-hot-toast";
@@ -212,6 +213,20 @@ export default function Advisor() {
     }
   };
 
+  const handleExportAdvice = () => {
+    if (!messages || messages.length === 0) { toast.error("No conversation to export"); return; }
+    let md = `# iKo Advisor Consultation\n\n`;
+    messages.forEach((m: any) => {
+      const role = m.role === "user" ? "**Student**" : "**Advisor**";
+      md += `${role}:\n${m.content}\n\n---\n\n`;
+    });
+    const blob = new Blob([md], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url;
+    a.download = "advisor_consultation.md"; a.click(); URL.revokeObjectURL(url);
+    toast.success("Consultation exported");
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -380,6 +395,9 @@ export default function Advisor() {
           </div>
 
           <div className="flex items-center gap-2">
+            <button onClick={handleExportAdvice} className="flex items-center gap-1 text-xs text-gray-400 hover:text-white bg-dark-700 border border-dark-500 rounded-lg px-2 py-1 transition-colors" title="Export consultation">
+              <Download size={12} /> Export
+            </button>
             <div className="text-xs text-gray-500 hidden sm:block">
               {messages.filter((m) => m.role === "user").length} messages
             </div>
