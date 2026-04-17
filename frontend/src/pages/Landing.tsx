@@ -28,6 +28,8 @@ import {
   Rocket,
   Wand2,
   Briefcase,
+  BookMarked,
+  Languages,
 } from "lucide-react";
 import Logo from "../components/Logo";
 import LLMComparison from "../components/LLMComparison";
@@ -47,6 +49,13 @@ const FEATURES = [
     description:
       "Complete thesis pipeline — from topic to polished document in 8 guided stages",
     color: "text-blue-400",
+  },
+  {
+    icon: BookOpen,
+    title: "iKo Lit-Review",
+    description:
+      "4-step automated literature review: topic → paper discovery → specifications → generated review with citations. Export as PDF, DOCX, or LaTeX.",
+    color: "text-indigo-400",
   },
   {
     icon: Edit3,
@@ -77,6 +86,13 @@ const FEATURES = [
     color: "text-red-400",
   },
   {
+    icon: BookMarked,
+    title: "iKo Journal",
+    description:
+      "Write for The Lancet, Nature, IEEE, and 20+ journals/conferences. Template-guided sections, word limits, and compliance checking against reviewer criteria.",
+    color: "text-amber-400",
+  },
+  {
     icon: UserCheck,
     title: "iKo Advisor",
     description:
@@ -91,11 +107,25 @@ const FEATURES = [
     color: "text-pink-400",
   },
   {
+    icon: FlaskConical,
+    title: "iKo DataLab",
+    description:
+      "Upload CSV/Excel data (150MB). Explore, visualize (6 chart types), run statistical tests (T-test, ANOVA, Chi-square), train ML models, and get AI interpretation.",
+    color: "text-emerald-400",
+  },
+  {
     icon: Search,
     title: "Paper Search & Citations",
     description:
       "Search 200M+ papers, auto-generate BibTeX, format APA/IEEE/Harvard",
     color: "text-teal-400",
+  },
+  {
+    icon: Languages,
+    title: "iKo LangLearner",
+    description:
+      "Learn Russian, German, French, or Spanish with CEFR A1→C1 curriculum. 5 exercise types, XP tracking, streaks, and LLM-powered lessons.",
+    color: "text-lime-400",
   },
 ];
 
@@ -346,6 +376,10 @@ export default function Landing() {
         <p className="text-gray-400 text-center mb-10">
           Start free, upgrade when you need more
         </p>
+        <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-6 text-center mb-8">
+          <p className="text-green-400 text-lg font-bold mb-2">🎉 All Features Free During Public Testing</p>
+          <p className="text-gray-300 text-sm">Full access to all 4 LLMs, all tools, unlimited uploads. No credit card needed.</p>
+        </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {TIERS.map((tier) => (
             <div
