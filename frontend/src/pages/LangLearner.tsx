@@ -452,7 +452,7 @@ export default function LangLearner() {
             {/* Language selector */}
             <div className="flex gap-2 flex-wrap">
               {["russian", "german", "french", "spanish"].map(lang => {
-                const locked = lang !== "russian";
+                const locked = false; // all 4 languages now active
                 return (
                   <button
                     key={lang}
