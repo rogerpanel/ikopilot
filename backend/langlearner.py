@@ -139,9 +139,162 @@ CURRICULUM = {
                 ]},
         },
     },
-    "german": {"name": "German", "native_name": "Deutsch", "flag": "🇩🇪", "available": False, "levels": {}},
-    "french": {"name": "French", "native_name": "Français", "flag": "🇫🇷", "available": False, "levels": {}},
-    "spanish": {"name": "Spanish", "native_name": "Español", "flag": "🇪🇸", "available": False, "levels": {}},
+    "german": {
+        "name": "German", "native_name": "Deutsch", "flag": "🇩🇪",
+        "available": True,
+        "levels": {
+            "A1": {"name": "Beginner", "description": "Basic phrases, greetings, numbers, articles",
+                "units": [
+                    {"id": 1, "title": "Greetings & Introductions", "lessons": [
+                        {"id": 1, "title": "Hello & Goodbye", "type": "vocabulary", "xp": 10},
+                        {"id": 2, "title": "My Name Is...", "type": "vocabulary", "xp": 10},
+                        {"id": 3, "title": "How Are You?", "type": "conversation", "xp": 15},
+                    ]},
+                    {"id": 2, "title": "Articles & Gender", "lessons": [
+                        {"id": 1, "title": "Der, Die, Das", "type": "grammar", "xp": 15},
+                        {"id": 2, "title": "Plural Forms", "type": "grammar", "xp": 15},
+                    ]},
+                    {"id": 3, "title": "Numbers & Time", "lessons": [
+                        {"id": 1, "title": "Numbers 1-20", "type": "vocabulary", "xp": 10},
+                        {"id": 2, "title": "Telling Time", "type": "practical", "xp": 15},
+                    ]},
+                    {"id": 4, "title": "Essential Phrases", "lessons": [
+                        {"id": 1, "title": "Please, Thank You, Sorry", "type": "vocabulary", "xp": 10},
+                        {"id": 2, "title": "At the Café", "type": "conversation", "xp": 20},
+                    ]},
+                ]},
+            "A2": {"name": "Elementary", "description": "Simple conversations, present tense, cases",
+                "units": [
+                    {"id": 1, "title": "Present Tense Verbs", "lessons": [
+                        {"id": 1, "title": "Regular Verbs", "type": "grammar", "xp": 15},
+                        {"id": 2, "title": "Stem-Changing Verbs", "type": "grammar", "xp": 15},
+                        {"id": 3, "title": "Separable Verbs", "type": "grammar", "xp": 20},
+                    ]},
+                    {"id": 2, "title": "Cases: Nominative & Accusative", "lessons": [
+                        {"id": 1, "title": "Nominative Case", "type": "grammar", "xp": 15},
+                        {"id": 2, "title": "Accusative Case", "type": "grammar", "xp": 20},
+                    ]},
+                    {"id": 3, "title": "Daily Life", "lessons": [
+                        {"id": 1, "title": "Family & Home", "type": "vocabulary", "xp": 15},
+                        {"id": 2, "title": "Food & Shopping", "type": "vocabulary", "xp": 15},
+                        {"id": 3, "title": "Weather & Seasons", "type": "vocabulary", "xp": 15},
+                    ]},
+                ]},
+            "B1": {"name": "Intermediate", "description": "Past tenses, dative case, opinions",
+                "units": [
+                    {"id": 1, "title": "Past Tenses", "lessons": [
+                        {"id": 1, "title": "Perfekt (Present Perfect)", "type": "grammar", "xp": 20},
+                        {"id": 2, "title": "Präteritum (Simple Past)", "type": "grammar", "xp": 20},
+                    ]},
+                    {"id": 2, "title": "Dative Case & Prepositions", "lessons": [
+                        {"id": 1, "title": "Dative Case", "type": "grammar", "xp": 20},
+                        {"id": 2, "title": "Two-Way Prepositions", "type": "grammar", "xp": 25},
+                    ]},
+                    {"id": 3, "title": "Expressing Opinions", "lessons": [
+                        {"id": 1, "title": "Ich denke, dass...", "type": "conversation", "xp": 20},
+                        {"id": 2, "title": "Konjunktiv II (Would)", "type": "grammar", "xp": 25},
+                    ]},
+                ]},
+            "B2": {"name": "Upper Intermediate", "description": "Complex grammar, professional German", "units": []},
+            "C1": {"name": "Advanced", "description": "Academic German, nuanced expression", "units": []},
+        },
+    },
+    "french": {
+        "name": "French", "native_name": "Français", "flag": "🇫🇷",
+        "available": True,
+        "levels": {
+            "A1": {"name": "Beginner", "description": "Basic phrases, greetings, numbers, gender",
+                "units": [
+                    {"id": 1, "title": "Greetings & Introductions", "lessons": [
+                        {"id": 1, "title": "Bonjour & Au revoir", "type": "vocabulary", "xp": 10},
+                        {"id": 2, "title": "Je m'appelle...", "type": "vocabulary", "xp": 10},
+                        {"id": 3, "title": "Comment allez-vous?", "type": "conversation", "xp": 15},
+                    ]},
+                    {"id": 2, "title": "Articles & Gender", "lessons": [
+                        {"id": 1, "title": "Le, La, Les", "type": "grammar", "xp": 15},
+                        {"id": 2, "title": "Un, Une, Des", "type": "grammar", "xp": 15},
+                    ]},
+                    {"id": 3, "title": "Numbers & Essentials", "lessons": [
+                        {"id": 1, "title": "Numbers 1-20", "type": "vocabulary", "xp": 10},
+                        {"id": 2, "title": "S'il vous plaît & Merci", "type": "vocabulary", "xp": 10},
+                        {"id": 3, "title": "At the Café", "type": "conversation", "xp": 20},
+                    ]},
+                ]},
+            "A2": {"name": "Elementary", "description": "Present tense, basic conversations",
+                "units": [
+                    {"id": 1, "title": "Present Tense", "lessons": [
+                        {"id": 1, "title": "-ER Verbs (parler, manger)", "type": "grammar", "xp": 15},
+                        {"id": 2, "title": "-IR and -RE Verbs", "type": "grammar", "xp": 15},
+                        {"id": 3, "title": "Être & Avoir", "type": "grammar", "xp": 20},
+                    ]},
+                    {"id": 2, "title": "Daily Life", "lessons": [
+                        {"id": 1, "title": "Family & Home", "type": "vocabulary", "xp": 15},
+                        {"id": 2, "title": "Food & Shopping", "type": "vocabulary", "xp": 15},
+                    ]},
+                ]},
+            "B1": {"name": "Intermediate", "description": "Past tenses, subjunctive, opinions",
+                "units": [
+                    {"id": 1, "title": "Past Tenses", "lessons": [
+                        {"id": 1, "title": "Passé Composé", "type": "grammar", "xp": 20},
+                        {"id": 2, "title": "Imparfait", "type": "grammar", "xp": 20},
+                    ]},
+                    {"id": 2, "title": "Expressing Opinions", "lessons": [
+                        {"id": 1, "title": "Je pense que...", "type": "conversation", "xp": 20},
+                        {"id": 2, "title": "Subjonctif Basics", "type": "grammar", "xp": 25},
+                    ]},
+                ]},
+            "B2": {"name": "Upper Intermediate", "description": "Complex grammar, professional French", "units": []},
+            "C1": {"name": "Advanced", "description": "Academic French, nuanced expression", "units": []},
+        },
+    },
+    "spanish": {
+        "name": "Spanish", "native_name": "Español", "flag": "🇪🇸",
+        "available": True,
+        "levels": {
+            "A1": {"name": "Beginner", "description": "Basic phrases, greetings, numbers, gender",
+                "units": [
+                    {"id": 1, "title": "Greetings & Introductions", "lessons": [
+                        {"id": 1, "title": "Hola & Adiós", "type": "vocabulary", "xp": 10},
+                        {"id": 2, "title": "Me llamo...", "type": "vocabulary", "xp": 10},
+                        {"id": 3, "title": "¿Cómo estás?", "type": "conversation", "xp": 15},
+                    ]},
+                    {"id": 2, "title": "Articles & Gender", "lessons": [
+                        {"id": 1, "title": "El, La, Los, Las", "type": "grammar", "xp": 15},
+                        {"id": 2, "title": "Un, Una, Unos, Unas", "type": "grammar", "xp": 15},
+                    ]},
+                    {"id": 3, "title": "Numbers & Essentials", "lessons": [
+                        {"id": 1, "title": "Numbers 1-20", "type": "vocabulary", "xp": 10},
+                        {"id": 2, "title": "Por favor & Gracias", "type": "vocabulary", "xp": 10},
+                        {"id": 3, "title": "At the Café", "type": "conversation", "xp": 20},
+                    ]},
+                ]},
+            "A2": {"name": "Elementary", "description": "Present tense, basic conversations",
+                "units": [
+                    {"id": 1, "title": "Present Tense", "lessons": [
+                        {"id": 1, "title": "-AR Verbs (hablar, estudiar)", "type": "grammar", "xp": 15},
+                        {"id": 2, "title": "-ER and -IR Verbs", "type": "grammar", "xp": 15},
+                        {"id": 3, "title": "Ser & Estar", "type": "grammar", "xp": 20},
+                    ]},
+                    {"id": 2, "title": "Daily Life", "lessons": [
+                        {"id": 1, "title": "Family & Home", "type": "vocabulary", "xp": 15},
+                        {"id": 2, "title": "Food & Shopping", "type": "vocabulary", "xp": 15},
+                    ]},
+                ]},
+            "B1": {"name": "Intermediate", "description": "Past tenses, subjunctive, opinions",
+                "units": [
+                    {"id": 1, "title": "Past Tenses", "lessons": [
+                        {"id": 1, "title": "Pretérito Indefinido", "type": "grammar", "xp": 20},
+                        {"id": 2, "title": "Pretérito Imperfecto", "type": "grammar", "xp": 20},
+                    ]},
+                    {"id": 2, "title": "Expressing Opinions", "lessons": [
+                        {"id": 1, "title": "Creo que... / Pienso que...", "type": "conversation", "xp": 20},
+                        {"id": 2, "title": "Subjuntivo Basics", "type": "grammar", "xp": 25},
+                    ]},
+                ]},
+            "B2": {"name": "Upper Intermediate", "description": "Complex grammar, professional Spanish", "units": []},
+            "C1": {"name": "Advanced", "description": "Academic Spanish, nuanced expression", "units": []},
+        },
+    },
 }
 
 
@@ -373,8 +526,160 @@ EXERCISE_BANK = {
                 {"type": "sentence_build", "words": ["пожалуйста", "Кофе", ","], "correct_order": [1, 2, 0], "translation": "Coffee, please"},
                 {"type": "fill_blank", "sentence": "Можно ___, пожалуйста? (Can I have water, please?)", "answer": "воду", "hint": "The accusative case of 'вода' (water)"},
             ],
-        }
-    }
+        },
+        "A2": {
+            "1-1": [
+                {"type": "multiple_choice", "question": "What gender is 'стол' (table)?", "options": ["Masculine", "Feminine", "Neuter"], "correct": 0, "explanation": "Стол ends in a consonant → masculine. Most nouns ending in a consonant are masculine."},
+                {"type": "multiple_choice", "question": "What gender is 'книга' (book)?", "options": ["Masculine", "Feminine", "Neuter"], "correct": 1, "explanation": "Книга ends in -а → feminine. Most nouns ending in -а/-я are feminine."},
+                {"type": "multiple_choice", "question": "What gender is 'окно' (window)?", "options": ["Masculine", "Feminine", "Neuter"], "correct": 2, "explanation": "Окно ends in -о → neuter. Most nouns ending in -о/-е are neuter."},
+                {"type": "matching", "instruction": "Match the noun to its gender", "pairs": [["дом (house)", "Masculine"], ["мама (mom)", "Feminine"], ["молоко (milk)", "Neuter"], ["студент (student)", "Masculine"], ["школа (school)", "Feminine"]]},
+                {"type": "fill_blank", "sentence": "The word 'письмо' (letter) is ___ gender because it ends in -о", "answer": "neuter", "hint": "-о ending = neuter"},
+            ],
+            "1-2": [
+                {"type": "multiple_choice", "question": "What is the plural of 'стол' (table)?", "options": ["столы", "стола", "столи", "столе"], "correct": 0, "explanation": "Masculine nouns ending in consonant → add -ы. Стол → столы."},
+                {"type": "multiple_choice", "question": "What is the plural of 'книга' (book)?", "options": ["книги", "книга", "книгы", "книге"], "correct": 0, "explanation": "Feminine -а → -и (after г, к, х, ж, ч, ш, щ). Книга → книги."},
+                {"type": "fill_blank", "sentence": "The plural of 'окно' (window) is ___", "answer": "окна", "hint": "Neuter -о → -а in plural"},
+                {"type": "matching", "instruction": "Match singular to plural", "pairs": [["студент", "студенты"], ["книга", "книги"], ["окно", "окна"], ["стул (chair)", "стулья"], ["дом", "дома"]]},
+                {"type": "translation", "direction": "ru_to_en", "sentence": "столы и стулья", "answer": "tables and chairs", "explanation": "столы = tables, стулья = chairs (irregular plural)."},
+            ],
+            "1-3": [
+                {"type": "multiple_choice", "question": "Which is correct: 'мой книга' or 'моя книга'?", "options": ["моя книга", "мой книга", "моё книга", "мои книга"], "correct": 0, "explanation": "Книга is feminine → моя. Мой = masculine, моё = neuter, мои = plural."},
+                {"type": "matching", "instruction": "Match possessive to gender", "pairs": [["мой", "masculine"], ["моя", "feminine"], ["моё", "neuter"], ["мои", "plural"]]},
+                {"type": "fill_blank", "sentence": "___ дом (my house) — дом is masculine", "answer": "мой", "hint": "Masculine possessive 'my'"},
+                {"type": "fill_blank", "sentence": "___ окно (my window) — окно is neuter", "answer": "моё", "hint": "Neuter possessive 'my'"},
+                {"type": "multiple_choice", "question": "'Наш университет' means:", "options": ["Our university", "My university", "Your university", "Their university"], "correct": 0, "explanation": "Наш = our. Мой = my, твой = your, их = their."},
+            ],
+            "2-1": [
+                {"type": "multiple_choice", "question": "What is the я-form of 'читать' (to read)?", "options": ["читаю", "читаешь", "читает", "читать"], "correct": 0, "explanation": "Читать → я читаю. Group 1 verbs (-ать): remove -ть, add -ю."},
+                {"type": "matching", "instruction": "Conjugate 'знать' (to know)", "pairs": [["я", "знаю"], ["ты", "знаешь"], ["он/она", "знает"], ["мы", "знаем"], ["они", "знают"]]},
+                {"type": "fill_blank", "sentence": "Я ___ по-русски (I speak Russian) — verb: говорить", "answer": "говорю", "hint": "говорить is Group 2 — я form ends in -ю"},
+                {"type": "translation", "direction": "en_to_ru", "sentence": "I read a book", "answer": "Я читаю книгу", "explanation": "Читаю = I read, книгу = book (accusative case)."},
+                {"type": "sentence_build", "words": ["читаю", "книгу", "Я"], "correct_order": [2, 0, 1], "translation": "I read a book"},
+            ],
+            "2-2": [
+                {"type": "multiple_choice", "question": "What is the я-form of 'говорить' (to speak)?", "options": ["говорю", "говоришь", "говорит", "говорить"], "correct": 0, "explanation": "Говорить → я говорю. Group 2 verbs (-ить): remove -ить, add -ю (with possible consonant change)."},
+                {"type": "matching", "instruction": "Conjugate 'любить' (to love)", "pairs": [["я", "люблю"], ["ты", "любишь"], ["он/она", "любит"], ["мы", "любим"], ["они", "любят"]]},
+                {"type": "fill_blank", "sentence": "Он ___ музыку (He loves music)", "answer": "любит", "hint": "Third person singular of 'любить'"},
+                {"type": "translation", "direction": "ru_to_en", "sentence": "Мы говорим по-русски", "answer": "We speak Russian", "explanation": "Говорим = we speak, по-русски = in Russian."},
+            ],
+            "2-3": [
+                {"type": "multiple_choice", "question": "'Хотеть' (to want) — я form is:", "options": ["хочу", "хотю", "хочешь", "хотеть"], "correct": 0, "explanation": "Хотеть is irregular: я хочу, ты хочешь, он хочет, мы хотим, они хотят."},
+                {"type": "multiple_choice", "question": "'Есть' (to eat) — я form is:", "options": ["ем", "ею", "есть", "еш"], "correct": 0, "explanation": "Есть is irregular: я ем, ты ешь, он ест, мы едим, они едят."},
+                {"type": "fill_blank", "sentence": "Я ___ в университете (I study at university) — verb: учиться", "answer": "учусь", "hint": "Reflexive verb: -ся becomes -сь after vowels"},
+                {"type": "matching", "instruction": "Match irregular verbs", "pairs": [["хотеть → я", "хочу"], ["есть → я", "ем"], ["пить → я", "пью"], ["идти → я", "иду"], ["мочь → я", "могу"]]},
+            ],
+            "2-4": [
+                {"type": "translation", "direction": "en_to_ru", "sentence": "I wake up at 7", "answer": "Я просыпаюсь в семь", "alternatives": ["Я просыпаюсь в 7"], "explanation": "Просыпаюсь = I wake up (reflexive), в семь = at seven."},
+                {"type": "multiple_choice", "question": "What does 'Я завтракаю' mean?", "options": ["I eat breakfast", "I eat lunch", "I eat dinner", "I cook"], "correct": 0, "explanation": "Завтракать = to eat breakfast. Обедать = lunch. Ужинать = dinner."},
+                {"type": "matching", "instruction": "Match daily routine verbs", "pairs": [["просыпаться", "wake up"], ["завтракать", "eat breakfast"], ["работать", "work"], ["обедать", "eat lunch"], ["ложиться спать", "go to bed"]]},
+                {"type": "sentence_build", "words": ["в", "Я", "семь", "просыпаюсь"], "correct_order": [1, 3, 0, 2], "translation": "I wake up at seven"},
+                {"type": "fill_blank", "sentence": "Вечером я ___ спать (In the evening I go to bed)", "answer": "ложусь", "hint": "Reflexive verb 'ложиться' in я-form"},
+            ],
+            "3-1": [
+                {"type": "multiple_choice", "question": "The nominative case answers which questions?", "options": ["Кто? Что? (Who? What?)", "Кого? Что? (Whom? What?)", "Кому? (To whom?)", "Где? (Where?)"], "correct": 0, "explanation": "Nominative = кто? что? It's the dictionary form and subject of the sentence."},
+                {"type": "fill_blank", "sentence": "___ читает книгу (The student reads a book) — nominative case", "answer": "Студент", "hint": "The subject (who?) is in nominative case — no change needed"},
+                {"type": "multiple_choice", "question": "In 'Мама готовит ужин', what case is 'мама'?", "options": ["Nominative", "Accusative", "Dative", "Genitive"], "correct": 0, "explanation": "Мама is the subject (who is cooking?) → nominative."},
+                {"type": "translation", "direction": "ru_to_en", "sentence": "Это мой друг", "answer": "This is my friend", "explanation": "Это = this is. Мой друг = my friend (nominative)."},
+            ],
+            "3-2": [
+                {"type": "multiple_choice", "question": "The accusative case answers:", "options": ["Кого? Что? (Whom? What?)", "Кто? Что? (Who? What?)", "Кому? (To whom?)", "О ком? (About whom?)"], "correct": 0, "explanation": "Accusative = кого? что? Used for direct objects."},
+                {"type": "multiple_choice", "question": "In 'Я читаю книгу', why is it 'книгу' not 'книга'?", "options": ["Accusative case (direct object)", "Genitive case", "Dative case", "It's plural"], "correct": 0, "explanation": "Книга → книгу in accusative. Feminine -а → -у."},
+                {"type": "fill_blank", "sentence": "Я люблю ___ (I love mom) — мама in accusative", "answer": "маму", "hint": "Feminine -а → -у in accusative"},
+                {"type": "matching", "instruction": "Nominative → Accusative", "pairs": [["книга", "книгу"], ["мама", "маму"], ["студент (animate)", "студента"], ["окно", "окно"], ["стол", "стол"]]},
+                {"type": "translation", "direction": "en_to_ru", "sentence": "I love music", "answer": "Я люблю музыку", "explanation": "Музыка → музыку in accusative (feminine -а → -у)."},
+            ],
+            "3-3": [
+                {"type": "multiple_choice", "question": "The prepositional case is used with which prepositions?", "options": ["в, на, о (in, on, about)", "из, от (from)", "к, по (to, along)", "с, без (with, without)"], "correct": 0, "explanation": "Prepositional case follows в (in), на (on), о (about)."},
+                {"type": "fill_blank", "sentence": "Я живу в ___ (I live in Moscow) — Москва in prepositional", "answer": "Москве", "hint": "Feminine -а → -е in prepositional case"},
+                {"type": "multiple_choice", "question": "'Он думает о работе' — what case is 'работе'?", "options": ["Prepositional", "Accusative", "Nominative", "Genitive"], "correct": 0, "explanation": "О + prepositional case. Работа → работе (feminine -а → -е)."},
+                {"type": "matching", "instruction": "Form prepositional case", "pairs": [["Москва", "в Москве"], ["университет", "в университете"], ["школа", "в школе"], ["дом", "в доме"], ["офис", "в офисе"]]},
+                {"type": "translation", "direction": "en_to_ru", "sentence": "I work in an office", "answer": "Я работаю в офисе", "explanation": "Офис → в офисе (prepositional after 'в')."},
+            ],
+            "4-1": [
+                {"type": "matching", "instruction": "Match family members", "pairs": [["мама", "mom"], ["папа", "dad"], ["брат", "brother"], ["сестра", "sister"], ["бабушка", "grandmother"]]},
+                {"type": "translation", "direction": "ru_to_en", "sentence": "У меня есть брат и сестра", "answer": "I have a brother and sister", "alternatives": ["I have a brother and a sister"], "explanation": "У меня есть = I have. Брат = brother, сестра = sister."},
+                {"type": "fill_blank", "sentence": "Мой ___ работает в больнице (My dad works in a hospital)", "answer": "папа", "hint": "Father/dad"},
+                {"type": "multiple_choice", "question": "'Дедушка' means:", "options": ["Grandfather", "Grandmother", "Uncle", "Father"], "correct": 0, "explanation": "Дедушка = grandfather. Бабушка = grandmother."},
+            ],
+            "4-2": [
+                {"type": "matching", "instruction": "Match food words", "pairs": [["хлеб", "bread"], ["сыр", "cheese"], ["мясо", "meat"], ["рыба", "fish"], ["овощи", "vegetables"]]},
+                {"type": "translation", "direction": "en_to_ru", "sentence": "I want to buy bread", "answer": "Я хочу купить хлеб", "explanation": "Хочу = want, купить = to buy, хлеб = bread."},
+                {"type": "multiple_choice", "question": "'Сколько стоит?' means:", "options": ["How much does it cost?", "Where is it?", "What is it?", "Is it good?"], "correct": 0, "explanation": "Сколько стоит? = How much does it cost?"},
+                {"type": "fill_blank", "sentence": "Дайте, пожалуйста, ___ (Give me cheese, please)", "answer": "сыр", "hint": "A yellow dairy product"},
+                {"type": "sentence_build", "words": ["купить", "хочу", "хлеб", "Я"], "correct_order": [3, 1, 0, 2], "translation": "I want to buy bread"},
+            ],
+            "4-3": [
+                {"type": "matching", "instruction": "Match weather words", "pairs": [["жарко", "hot"], ["холодно", "cold"], ["дождь", "rain"], ["снег", "snow"], ["ветер", "wind"]]},
+                {"type": "multiple_choice", "question": "'Сегодня холодно' means:", "options": ["It's cold today", "It's hot today", "It's raining today", "It's sunny today"], "correct": 0, "explanation": "Сегодня = today, холодно = cold."},
+                {"type": "matching", "instruction": "Match seasons", "pairs": [["зима", "winter"], ["весна", "spring"], ["лето", "summer"], ["осень", "autumn"]]},
+                {"type": "translation", "direction": "en_to_ru", "sentence": "It's warm today", "answer": "Сегодня тепло", "explanation": "Тепло = warm."},
+                {"type": "fill_blank", "sentence": "Зимой в России очень ___ (In winter in Russia it's very cold)", "answer": "холодно", "hint": "The opposite of hot"},
+            ],
+            "4-4": [
+                {"type": "translation", "direction": "en_to_ru", "sentence": "I would like tea with sugar", "answer": "Я хотел бы чай с сахаром", "alternatives": ["Я хотела бы чай с сахаром"], "explanation": "С сахаром = with sugar (instrumental case)."},
+                {"type": "multiple_choice", "question": "How do you ask for the menu?", "options": ["Меню, пожалуйста", "Счёт, пожалуйста", "Спасибо", "До свидания"], "correct": 0, "explanation": "Меню = menu. Счёт = bill."},
+                {"type": "matching", "instruction": "Match restaurant phrases", "pairs": [["Меню, пожалуйста", "Menu, please"], ["Я хотел бы...", "I would like..."], ["Счёт, пожалуйста", "Bill, please"], ["Очень вкусно!", "Very delicious!"], ["Спасибо за ужин", "Thanks for dinner"]]},
+                {"type": "fill_blank", "sentence": "Очень ___! (Very delicious!)", "answer": "вкусно", "hint": "Adjective meaning 'delicious/tasty'"},
+                {"type": "sentence_build", "words": ["бы", "хотел", "суп", "Я"], "correct_order": [3, 1, 0, 2], "translation": "I would like soup"},
+            ],
+        },
+    },
+    "german": {
+        "A1": {
+            "1-1": [
+                {"type": "multiple_choice", "question": "How do you say 'Hello' in German?", "options": ["Hallo", "Tschüss", "Danke", "Bitte"], "correct": 0, "explanation": "Hallo = Hello. Tschüss = Bye. Danke = Thanks. Bitte = Please."},
+                {"type": "multiple_choice", "question": "Which is the FORMAL greeting?", "options": ["Guten Tag", "Hallo", "Hi", "Na"], "correct": 0, "explanation": "Guten Tag (Good day) is formal. Hallo/Hi are informal."},
+                {"type": "translation", "direction": "de_to_en", "sentence": "Auf Wiedersehen", "answer": "Goodbye", "alternatives": ["See you again"], "explanation": "Auf Wiedersehen = formal goodbye (literally 'until we see again')."},
+                {"type": "matching", "instruction": "Match greetings", "pairs": [["Guten Morgen", "Good morning"], ["Guten Tag", "Good day"], ["Guten Abend", "Good evening"], ["Gute Nacht", "Good night"], ["Tschüss", "Bye"]]},
+            ],
+            "1-2": [
+                {"type": "multiple_choice", "question": "How do you say 'My name is Anna'?", "options": ["Ich heiße Anna", "Ich bin Anna", "Ich habe Anna", "Mein Anna"], "correct": 0, "explanation": "Ich heiße... = My name is... (literally 'I am called...'). Ich bin Anna also works."},
+                {"type": "translation", "direction": "en_to_de", "sentence": "What is your name?", "answer": "Wie heißen Sie?", "alternatives": ["Wie heißt du?"], "explanation": "Wie heißen Sie? (formal) / Wie heißt du? (informal)."},
+                {"type": "fill_blank", "sentence": "Ich ___ Max (My name is Max)", "answer": "heiße", "hint": "The verb 'heißen' in ich-form"},
+                {"type": "sentence_build", "words": ["heiße", "Anna", "Ich"], "correct_order": [2, 0, 1], "translation": "My name is Anna"},
+            ],
+            "1-3": [
+                {"type": "translation", "direction": "en_to_de", "sentence": "How are you? (informal)", "answer": "Wie geht es dir?", "alternatives": ["Wie geht's?", "Wie geht's dir?"], "explanation": "Wie geht es dir? (informal) / Wie geht es Ihnen? (formal)."},
+                {"type": "matching", "instruction": "Match responses", "pairs": [["Gut", "Good"], ["Sehr gut", "Very good"], ["Nicht so gut", "Not so good"], ["Es geht", "It's okay"], ["Schlecht", "Bad"]]},
+                {"type": "multiple_choice", "question": "'Danke, mir geht es gut' means:", "options": ["Thanks, I'm fine", "Thanks, I'm bad", "Thank you very much", "Thanks, see you"], "correct": 0, "explanation": "Danke = thanks, mir geht es gut = I'm fine."},
+                {"type": "fill_blank", "sentence": "Wie geht es ___? (How are you? — formal)", "answer": "Ihnen", "hint": "Formal 'you' in dative"},
+            ],
+            "2-1": [
+                {"type": "multiple_choice", "question": "Which article is masculine?", "options": ["der", "die", "das"], "correct": 0, "explanation": "Der = masculine, die = feminine, das = neuter."},
+                {"type": "matching", "instruction": "Match noun to article", "pairs": [["der Mann", "the man"], ["die Frau", "the woman"], ["das Kind", "the child"], ["der Tisch", "the table"], ["die Katze", "the cat"]]},
+                {"type": "multiple_choice", "question": "What article does 'Buch' (book) take?", "options": ["das", "der", "die"], "correct": 0, "explanation": "Das Buch = the book. Buch is neuter."},
+                {"type": "fill_blank", "sentence": "___ Hund ist groß (The dog is big)", "answer": "Der", "hint": "Hund is masculine"},
+            ],
+            "2-2": [
+                {"type": "multiple_choice", "question": "What is the plural of 'das Kind'?", "options": ["die Kinder", "die Kinds", "das Kinder", "der Kinder"], "correct": 0, "explanation": "All plurals use 'die'. Kind → Kinder."},
+                {"type": "matching", "instruction": "Match singular to plural", "pairs": [["das Kind", "die Kinder"], ["der Mann", "die Männer"], ["die Frau", "die Frauen"], ["das Buch", "die Bücher"], ["der Hund", "die Hunde"]]},
+                {"type": "fill_blank", "sentence": "Die ___ spielen im Park (The children play in the park)", "answer": "Kinder", "hint": "Plural of 'Kind'"},
+            ],
+            "3-1": [
+                {"type": "matching", "instruction": "Match numbers", "pairs": [["eins", "1"], ["zwei", "2"], ["drei", "3"], ["vier", "4"], ["fünf", "5"]]},
+                {"type": "matching", "instruction": "Match numbers 6-10", "pairs": [["sechs", "6"], ["sieben", "7"], ["acht", "8"], ["neun", "9"], ["zehn", "10"]]},
+                {"type": "fill_blank", "sentence": "Sieben plus drei ist ___", "answer": "zehn", "hint": "7 + 3 = ?"},
+                {"type": "translation", "direction": "de_to_en", "sentence": "zwanzig", "answer": "twenty", "alternatives": ["20"], "explanation": "Zwanzig = 20."},
+            ],
+            "3-2": [
+                {"type": "multiple_choice", "question": "How do you ask 'What time is it?' in German?", "options": ["Wie spät ist es?", "Wie alt bist du?", "Wie heißen Sie?", "Wo ist das?"], "correct": 0, "explanation": "Wie spät ist es? = What time is it? (literally 'How late is it?')"},
+                {"type": "translation", "direction": "de_to_en", "sentence": "Es ist drei Uhr", "answer": "It is three o'clock", "alternatives": ["It's three o'clock", "It's 3 o'clock"], "explanation": "Es ist... Uhr = It is... o'clock."},
+                {"type": "fill_blank", "sentence": "Es ist halb ___ (It is half past two — 2:30)", "answer": "drei", "hint": "In German, 'halb drei' means half TO three = 2:30"},
+            ],
+            "4-1": [
+                {"type": "translation", "direction": "en_to_de", "sentence": "Please", "answer": "Bitte", "explanation": "Bitte = please / you're welcome."},
+                {"type": "translation", "direction": "en_to_de", "sentence": "Thank you very much", "answer": "Vielen Dank", "alternatives": ["Danke schön", "Danke sehr"], "explanation": "Vielen Dank / Danke schön = Thank you very much."},
+                {"type": "matching", "instruction": "Match polite phrases", "pairs": [["Bitte", "Please"], ["Danke", "Thanks"], ["Entschuldigung", "Excuse me"], ["Es tut mir leid", "I'm sorry"], ["Kein Problem", "No problem"]]},
+                {"type": "fill_blank", "sentence": "___, wo ist die Toilette? (Excuse me, where is the toilet?)", "answer": "Entschuldigung", "hint": "The polite way to get someone's attention"},
+            ],
+            "4-2": [
+                {"type": "translation", "direction": "en_to_de", "sentence": "I would like a coffee, please", "answer": "Ich hätte gerne einen Kaffee, bitte", "alternatives": ["Ich möchte einen Kaffee, bitte"], "explanation": "Ich hätte gerne... = I would like... (polite café ordering)."},
+                {"type": "matching", "instruction": "Match café vocabulary", "pairs": [["der Kaffee", "coffee"], ["der Tee", "tea"], ["das Wasser", "water"], ["das Bier", "beer"], ["der Kuchen", "cake"]]},
+                {"type": "fill_blank", "sentence": "Die Rechnung, ___ (The bill, please)", "answer": "bitte", "hint": "The German word for 'please'"},
+                {"type": "multiple_choice", "question": "'Zahlen, bitte' means:", "options": ["Pay, please (asking for the bill)", "Count, please", "Number, please", "More, please"], "correct": 0, "explanation": "Zahlen bitte = I'd like to pay (asking for the bill at a restaurant)."},
+            ],
+        },
+    },
 }
 
 
