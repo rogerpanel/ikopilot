@@ -28,6 +28,8 @@ from dochandler import router as dochandler_router
 from litreview import router as litreview_router
 from journal_templates import router as journal_router
 from datalab import router as datalab_router
+from flashcards import router as flashcards_router
+from mathlab import router as mathlab_router
 from langlearner import router as langlearner_router
 
 from sqlalchemy import select
@@ -117,6 +119,8 @@ app.include_router(dochandler_router)
 app.include_router(litreview_router)
 app.include_router(journal_router)
 app.include_router(datalab_router)
+app.include_router(flashcards_router)
+app.include_router(mathlab_router)
 app.include_router(langlearner_router)
 
 

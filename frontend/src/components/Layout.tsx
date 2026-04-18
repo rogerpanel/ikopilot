@@ -24,6 +24,8 @@ import {
   BookMarked,
   Languages,
   FlaskConical,
+  Calculator,
+  Brain,
 } from "lucide-react";
 import { clearAuth, getStoredUser, isAdmin } from "../utils/auth";
 import Logo from "./Logo";
@@ -83,6 +85,13 @@ export default function Layout() {
         { to: "/discover", label: "iKo Discover", icon: Search },
         { to: "/defense", label: "iKo Defense", icon: GraduationCap },
         { to: "/advisor", label: "iKo Advisor", icon: MessageCircle },
+      ],
+    },
+    {
+      label: "STUDY",
+      items: [
+        { to: "/flashcards", label: "iKo FlashCards", icon: Brain },
+        { to: "/mathlab", label: "iKo MathLab", icon: Calculator },
       ],
     },
   ];

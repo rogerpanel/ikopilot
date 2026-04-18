@@ -24,6 +24,8 @@ import Docs from "./pages/Docs";
 import LitReview from "./pages/LitReview";
 import JournalWriter from "./pages/JournalWriter";
 import DataLab from "./pages/DataLab";
+import FlashCards from "./pages/FlashCards";
+import MathLab from "./pages/MathLab";
 import LangLearner from "./pages/LangLearner";
 import Layout from "./components/Layout";
 
@@ -87,6 +89,8 @@ export default function App() {
           <Route path="journal" element={<JournalWriter />} />
           <Route path="datalab" element={<DataLab />} />
           <Route path="lang-learner" element={<LangLearner />} />
+          <Route path="flashcards" element={<FlashCards />} />
+          <Route path="mathlab" element={<MathLab />} />
           <Route path="docs" element={<Docs />} />
           <Route
             path="supervisor"
