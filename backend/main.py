@@ -30,7 +30,9 @@ from journal_templates import router as journal_router
 from datalab import router as datalab_router
 from flashcards import router as flashcards_router
 from mathlab import router as mathlab_router
+from qualcoder import router as qualcoder_router
 from langlearner import router as langlearner_router
+from notehub import router as notehub_router
 
 from sqlalchemy import select
 
@@ -121,7 +123,9 @@ app.include_router(journal_router)
 app.include_router(datalab_router)
 app.include_router(flashcards_router)
 app.include_router(mathlab_router)
+app.include_router(qualcoder_router)
 app.include_router(langlearner_router)
+app.include_router(notehub_router)
 
 
 @app.get("/api/health")

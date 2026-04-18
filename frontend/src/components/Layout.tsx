@@ -26,6 +26,8 @@ import {
   FlaskConical,
   Calculator,
   Brain,
+  FileSearch,
+  Notebook,
 } from "lucide-react";
 import { clearAuth, getStoredUser, isAdmin } from "../utils/auth";
 import Logo from "./Logo";
@@ -85,6 +87,8 @@ export default function Layout() {
         { to: "/discover", label: "iKo Discover", icon: Search },
         { to: "/defense", label: "iKo Defense", icon: GraduationCap },
         { to: "/advisor", label: "iKo Advisor", icon: MessageCircle },
+        { to: "/qualcoder", label: "iKo QualCoder", icon: FileSearch },
+        { to: "/notehub", label: "iKo NoteHub", icon: Notebook },
       ],
     },
     {
