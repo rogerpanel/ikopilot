@@ -47,6 +47,7 @@ interface NavSection {
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [rightOpen, setRightOpen] = useState(false);
+  const [paperSearchOpen, setPaperSearchOpen] = useState(false);
   const navigate = useNavigate();
   const user = getStoredUser();
 
@@ -111,20 +112,20 @@ export default function Layout() {
     { to: "/docs", label: "User Guide", icon: HelpCircle },
   ];
 
-  const renderNavLink = (item: NavItem) => (
+  const renderNavLink = (item: NavItem, compact = false) => (
     <NavLink
       key={item.to}
       to={item.to}
-      onClick={() => setSidebarOpen(false)}
+      onClick={() => { setSidebarOpen(false); setRightOpen(false); }}
       className={({ isActive }) =>
-        `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-          isActive
-            ? "bg-brand-orange/10 text-brand-orange"
-            : "text-gray-400 hover:bg-dark-700 hover:text-white"
+        `flex items-center gap-2 rounded-lg font-medium transition-colors ${
+          compact
+            ? `px-2 py-1.5 text-xs ${isActive ? "bg-brand-orange/10 text-brand-orange" : "text-gray-400 hover:bg-dark-700 hover:text-white"}`
+            : `px-3 py-2 text-sm gap-3 ${isActive ? "bg-brand-orange/10 text-brand-orange" : "text-gray-400 hover:bg-dark-700 hover:text-white"}`
         }`
       }
     >
-      <item.icon size={18} />
+      <item.icon size={compact ? 14 : 18} />
       {item.label}
     </NavLink>
   );
@@ -266,50 +267,57 @@ export default function Layout() {
         </main>
       </div>
 
-      {/* ===== RIGHT SIDEBAR (200px) — Tools & Intelligence ===== */}
+      {/* ===== RIGHT SIDEBAR (220px) — Tools & Intelligence ===== */}
       <aside
-        className={`fixed lg:static inset-y-0 right-0 z-50 w-[200px] bg-dark-800 border-l border-dark-500/30 flex flex-col transform transition-transform lg:transform-none ${
+        className={`fixed lg:static inset-y-0 right-0 z-50 w-[220px] bg-dark-800 border-l border-dark-500/30 flex flex-col transform transition-transform lg:transform-none ${
           rightOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"
         }`}
       >
         {/* Header */}
-        <div className="h-14 flex items-center justify-between px-4 border-b border-dark-500/30">
-          <Logo size="md" />
+        <div className="h-14 flex items-center justify-between px-4 border-b border-dark-500/30 shrink-0">
+          <Logo size="sm" />
           <button
             onClick={() => setRightOpen(false)}
             className="text-gray-400 hover:text-white"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
-        {/* Navigation */}
-        <nav className="py-3 px-2 space-y-1 overflow-y-auto">
-          {rightNavSections.map((section) => (
-            <div key={section.label}>
-              {renderSectionLabel(section.label)}
-              <div className="space-y-0.5">
-                {section.items.map(renderNavLink)}
+        {/* Scrollable content area */}
+        <div className="flex-1 overflow-y-auto">
+          {/* Navigation (compact) */}
+          <nav className="py-2 px-2 space-y-0.5">
+            {rightNavSections.map((section) => (
+              <div key={section.label}>
+                {renderSectionLabel(section.label)}
+                <div className="space-y-0">
+                  {section.items.map((item) => renderNavLink(item, true))}
+                </div>
               </div>
-            </div>
-          ))}
-        </nav>
+            ))}
+          </nav>
 
-        {/* Divider */}
-        <div className="border-t border-dark-500/30 mx-2" />
-
-        {/* Paper Search collapsible section */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Paper Search — collapsible */}
+          <div className="border-t border-dark-500/30 mx-2 mt-1" />
           <button
-            onClick={() => setRightOpen(!rightOpen)}
-            className="flex items-center justify-between px-3 py-2 text-[10px] uppercase tracking-wider text-gray-600 hover:text-gray-400 transition-colors"
+            onClick={() => setPaperSearchOpen(!paperSearchOpen)}
+            className="w-full flex items-center justify-between px-3 py-2 text-[10px] uppercase tracking-wider text-gray-500 hover:text-gray-300 transition-colors"
           >
-            <span>Paper Search</span>
-            <Search size={12} />
+            <span className="flex items-center gap-1.5">
+              <Search size={10} />
+              Paper Search
+            </span>
+            <ChevronRight
+              size={12}
+              className={`transition-transform ${paperSearchOpen ? "rotate-90" : ""}`}
+            />
           </button>
-          <div className="flex-1 overflow-y-auto">
-            <ScholarSearch />
-          </div>
+          {paperSearchOpen && (
+            <div className="px-1 pb-3">
+              <ScholarSearch />
+            </div>
+          )}
         </div>
       </aside>
 
