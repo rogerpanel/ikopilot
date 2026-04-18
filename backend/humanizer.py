@@ -667,3 +667,156 @@ def _export_tex_diff(req: ExportCorrectedRequest) -> Response:
         media_type="application/x-tex",
         headers={"Content-Disposition": f'attachment; filename="{safe_name}_corrected.tex"'},
     )
+
+
+# ---------- Readability Analyzer ----------
+
+@router.post("/readability")
+async def analyze_readability(
+    text: str = "",
+    user: User = Depends(get_current_user),
+):
+    """Compute readability metrics: Flesch-Kincaid, Gunning Fog, SMOG, Coleman-Liau, plus style analysis."""
+    if not text.strip():
+        raise HTTPException(status_code=400, detail="No text provided")
+
+    import math
+
+    # Tokenize
+    sentences = [s.strip() for s in re.split(r'[.!?]+', text) if len(s.strip()) > 5]
+    words = re.findall(r'\b[a-zA-ZА-Яа-яёЁ]+\b', text)
+    total_sentences = max(len(sentences), 1)
+    total_words = max(len(words), 1)
+
+    # Syllable counter (English approximation)
+    def count_syllables(word):
+        word = word.lower()
+        if len(word) <= 3:
+            return 1
+        vowels = "aeiouy"
+        count = 0
+        prev_vowel = False
+        for ch in word:
+            is_vowel = ch in vowels
+            if is_vowel and not prev_vowel:
+                count += 1
+            prev_vowel = is_vowel
+        if word.endswith("e") and count > 1:
+            count -= 1
+        return max(count, 1)
+
+    total_syllables = sum(count_syllables(w) for w in words)
+    complex_words = [w for w in words if count_syllables(w) >= 3]
+    total_complex = len(complex_words)
+
+    # Characters (for Coleman-Liau)
+    total_chars = sum(len(w) for w in words)
+
+    # ---------- Formulas ----------
+
+    # Flesch Reading Ease (0-100, higher = easier)
+    flesch_ease = 206.835 - 1.015 * (total_words / total_sentences) - 84.6 * (total_syllables / total_words)
+    flesch_ease = max(0, min(100, round(flesch_ease, 1)))
+
+    # Flesch-Kincaid Grade Level
+    fk_grade = 0.39 * (total_words / total_sentences) + 11.8 * (total_syllables / total_words) - 15.59
+    fk_grade = max(0, round(fk_grade, 1))
+
+    # Gunning Fog Index
+    fog = 0.4 * ((total_words / total_sentences) + 100 * (total_complex / total_words))
+    fog = round(fog, 1)
+
+    # SMOG Index
+    smog = 1.0430 * math.sqrt(total_complex * (30 / total_sentences)) + 3.1291 if total_sentences >= 3 else 0
+    smog = round(smog, 1)
+
+    # Coleman-Liau Index
+    L = (total_chars / total_words) * 100  # avg chars per 100 words
+    S = (total_sentences / total_words) * 100  # avg sentences per 100 words
+    coleman_liau = 0.0588 * L - 0.296 * S - 15.8
+    coleman_liau = max(0, round(coleman_liau, 1))
+
+    # ---------- Style Analysis ----------
+
+    # Passive voice detection (simple heuristic)
+    passive_patterns = re.findall(r'\b(?:is|are|was|were|been|being|be)\s+\w+(?:ed|en)\b', text, re.IGNORECASE)
+    passive_pct = round(len(passive_patterns) / total_sentences * 100, 1)
+
+    # Adverb density
+    adverb_count = len(re.findall(r'\b\w+ly\b', text))
+    adverb_pct = round(adverb_count / total_words * 100, 2)
+
+    # Sentence length distribution
+    sentence_lengths = [len(s.split()) for s in sentences]
+    avg_sentence_len = round(sum(sentence_lengths) / len(sentence_lengths), 1) if sentence_lengths else 0
+    long_sentences = [{"text": s[:100] + "..." if len(s) > 100 else s, "words": len(s.split())} for s in sentences if len(s.split()) > 30]
+    short_sentences = [{"text": s, "words": len(s.split())} for s in sentences if len(s.split()) < 8 and len(s.split()) > 0]
+
+    # Sentence starts repetition
+    starts = {}
+    for s in sentences:
+        first_word = s.split()[0].lower() if s.split() else ""
+        starts[first_word] = starts.get(first_word, 0) + 1
+    repetitive_starts = {w: c for w, c in starts.items() if c >= 3}
+
+    # Vocabulary richness (type-token ratio)
+    unique_words = len(set(w.lower() for w in words))
+    ttr = round(unique_words / total_words, 3)
+
+    # Grade level interpretation
+    if fk_grade <= 8:
+        level = "Easy — suitable for general audience"
+    elif fk_grade <= 12:
+        level = "Moderate — suitable for undergraduate level"
+    elif fk_grade <= 16:
+        level = "Challenging — suitable for graduate/academic level"
+    else:
+        level = "Very complex — may need simplification for clarity"
+
+    # Academic suitability
+    if 12 <= fk_grade <= 18 and passive_pct <= 30 and adverb_pct <= 3:
+        academic_rating = "good"
+        academic_note = "Text is at an appropriate academic level with balanced style."
+    elif fk_grade < 10:
+        academic_rating = "too_simple"
+        academic_note = "Text may read as too informal for academic publication. Consider more technical vocabulary."
+    elif fk_grade > 20:
+        academic_rating = "too_complex"
+        academic_note = "Text is very dense. Consider breaking long sentences and simplifying where possible."
+    elif passive_pct > 30:
+        academic_rating = "passive_heavy"
+        academic_note = f"Passive voice at {passive_pct}% — aim for under 25% for clearer academic writing."
+    else:
+        academic_rating = "acceptable"
+        academic_note = "Text is acceptable but could benefit from style improvements."
+
+    return {
+        "scores": {
+            "flesch_ease": flesch_ease,
+            "flesch_kincaid_grade": fk_grade,
+            "gunning_fog": fog,
+            "smog": smog,
+            "coleman_liau": coleman_liau,
+        },
+        "interpretation": {
+            "grade_level": level,
+            "academic_rating": academic_rating,
+            "academic_note": academic_note,
+        },
+        "style": {
+            "passive_voice_pct": passive_pct,
+            "adverb_density_pct": adverb_pct,
+            "avg_sentence_length": avg_sentence_len,
+            "vocabulary_richness": ttr,
+        },
+        "details": {
+            "total_words": total_words,
+            "total_sentences": total_sentences,
+            "total_syllables": total_syllables,
+            "complex_words": total_complex,
+            "unique_words": unique_words,
+            "long_sentences": long_sentences[:5],
+            "short_sentences": short_sentences[:5],
+            "repetitive_starts": repetitive_starts,
+        },
+    }

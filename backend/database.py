@@ -188,6 +188,26 @@ class Payment(Base):
     user = relationship("User")
 
 
+class Milestone(Base):
+    __tablename__ = "milestones"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
+    title = Column(String(255), nullable=False)
+    description = Column(Text, default="")
+    start_date = Column(DateTime(timezone=True), nullable=True)
+    due_date = Column(DateTime(timezone=True), nullable=True)
+    completed = Column(Boolean, default=False)
+    completed_at = Column(DateTime(timezone=True), nullable=True)
+    color = Column(String(7), default="#F97316")
+    sort_order = Column(Integer, default=0)
+    created_at = Column(DateTime(timezone=True), default=utcnow)
+
+    user = relationship("User")
+    project = relationship("Project")
+
+
 class LangProgress(Base):
     __tablename__ = "lang_progress"
 

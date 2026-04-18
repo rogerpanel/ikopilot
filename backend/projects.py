@@ -497,3 +497,178 @@ async def ask_pdf(
         "text_length": len(text),
         "model": model,
     }
+
+
+# ---------- Milestones / Timeline ----------
+
+from database import Milestone
+
+
+class MilestoneCreate(BaseModel):
+    title: str
+    description: str = ""
+    start_date: Optional[str] = None
+    due_date: Optional[str] = None
+    color: str = "#F97316"
+    project_id: Optional[int] = None
+
+
+class MilestoneUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    start_date: Optional[str] = None
+    due_date: Optional[str] = None
+    completed: Optional[bool] = None
+    color: Optional[str] = None
+    sort_order: Optional[int] = None
+
+
+@router.get("/milestones")
+async def list_milestones(
+    project_id: Optional[int] = None,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """List all milestones for the user, optionally filtered by project."""
+    query = select(Milestone).where(Milestone.user_id == user.id)
+    if project_id is not None:
+        query = query.where(Milestone.project_id == project_id)
+    query = query.order_by(Milestone.sort_order, Milestone.due_date)
+    result = await db.execute(query)
+    milestones = result.scalars().all()
+
+    return [
+        {
+            "id": m.id,
+            "title": m.title,
+            "description": m.description,
+            "start_date": m.start_date.isoformat() if m.start_date else None,
+            "due_date": m.due_date.isoformat() if m.due_date else None,
+            "completed": m.completed,
+            "completed_at": m.completed_at.isoformat() if m.completed_at else None,
+            "color": m.color,
+            "sort_order": m.sort_order,
+            "project_id": m.project_id,
+        }
+        for m in milestones
+    ]
+
+
+@router.post("/milestones")
+async def create_milestone(
+    req: MilestoneCreate,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Create a new milestone."""
+    from datetime import datetime
+
+    m = Milestone(
+        user_id=user.id,
+        project_id=req.project_id,
+        title=req.title,
+        description=req.description,
+        start_date=datetime.fromisoformat(req.start_date) if req.start_date else None,
+        due_date=datetime.fromisoformat(req.due_date) if req.due_date else None,
+        color=req.color,
+    )
+    db.add(m)
+    await db.commit()
+    await db.refresh(m)
+
+    return {
+        "id": m.id, "title": m.title, "description": m.description,
+        "start_date": m.start_date.isoformat() if m.start_date else None,
+        "due_date": m.due_date.isoformat() if m.due_date else None,
+        "completed": m.completed, "color": m.color,
+    }
+
+
+@router.put("/milestones/{milestone_id}")
+async def update_milestone(
+    milestone_id: int,
+    req: MilestoneUpdate,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Update a milestone."""
+    from datetime import datetime, timezone
+
+    result = await db.execute(
+        select(Milestone).where(Milestone.id == milestone_id, Milestone.user_id == user.id)
+    )
+    m = result.scalar_one_or_none()
+    if not m:
+        raise HTTPException(status_code=404, detail="Milestone not found")
+
+    updates = req.model_dump(exclude_none=True)
+    if "start_date" in updates and updates["start_date"]:
+        updates["start_date"] = datetime.fromisoformat(updates["start_date"])
+    if "due_date" in updates and updates["due_date"]:
+        updates["due_date"] = datetime.fromisoformat(updates["due_date"])
+    if "completed" in updates and updates["completed"] and not m.completed:
+        updates["completed_at"] = datetime.now(timezone.utc)
+
+    for key, val in updates.items():
+        setattr(m, key, val)
+
+    await db.commit()
+    return {"message": "Milestone updated"}
+
+
+@router.delete("/milestones/{milestone_id}")
+async def delete_milestone(
+    milestone_id: int,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Delete a milestone."""
+    result = await db.execute(
+        select(Milestone).where(Milestone.id == milestone_id, Milestone.user_id == user.id)
+    )
+    m = result.scalar_one_or_none()
+    if not m:
+        raise HTTPException(status_code=404, detail="Milestone not found")
+    await db.delete(m)
+    await db.commit()
+    return {"message": "Milestone deleted"}
+
+
+@router.post("/milestones/suggest")
+async def suggest_milestones(
+    level: str = "Master's thesis",
+    field: str = "",
+    user: User = Depends(get_current_user),
+):
+    """Use LLM to suggest a timeline of milestones based on academic level."""
+    from litreview import _call_llm
+    import json
+
+    system = (
+        "You are an academic project planner. Given the student's academic level and field, "
+        "suggest a realistic timeline of milestones for completing their research project. "
+        "Return ONLY valid JSON array:\n"
+        '[{"title": "...", "description": "...", "weeks_from_start": N, "duration_weeks": N, "color": "#hex"}]\n'
+        "Use 8-12 milestones. Colors: #F97316 (orange) for writing, #3B82F6 (blue) for research, "
+        "#10B981 (green) for data, #8B5CF6 (purple) for review, #EF4444 (red) for deadlines."
+    )
+    user_msg = f"Academic level: {level}\nField: {field or 'General'}\nSuggest milestones."
+
+    try:
+        raw = await _call_llm(system, user_msg, "deepseek")
+        import re
+        cleaned = re.sub(r"^```(?:json)?\s*", "", raw.strip())
+        cleaned = re.sub(r"\s*```$", "", cleaned)
+        milestones = json.loads(cleaned)
+        return {"milestones": milestones}
+    except Exception:
+        return {"milestones": [
+            {"title": "Literature Review", "weeks_from_start": 0, "duration_weeks": 4, "color": "#3B82F6"},
+            {"title": "Research Design", "weeks_from_start": 3, "duration_weeks": 3, "color": "#3B82F6"},
+            {"title": "Data Collection", "weeks_from_start": 6, "duration_weeks": 6, "color": "#10B981"},
+            {"title": "Data Analysis", "weeks_from_start": 10, "duration_weeks": 4, "color": "#10B981"},
+            {"title": "Writing First Draft", "weeks_from_start": 12, "duration_weeks": 6, "color": "#F97316"},
+            {"title": "Supervisor Review", "weeks_from_start": 17, "duration_weeks": 2, "color": "#8B5CF6"},
+            {"title": "Revisions", "weeks_from_start": 19, "duration_weeks": 3, "color": "#F97316"},
+            {"title": "Final Submission", "weeks_from_start": 22, "duration_weeks": 1, "color": "#EF4444"},
+        ]}
