@@ -61,6 +61,22 @@ DESIGN_MODES = [
         "output_format": "code",
         "icon": "Layout",
     },
+    {
+        "id": "poster",
+        "name": "Academic Poster",
+        "description": "Generate HTML/CSS conference posters with proper academic layout (A0/A1 size)",
+        "llm": "claude",
+        "output_format": "code",
+        "icon": "Presentation",
+    },
+    {
+        "id": "slides",
+        "name": "Slide Deck",
+        "description": "Generate reveal.js HTML slide presentations for defense or conference talks",
+        "llm": "claude",
+        "output_format": "code",
+        "icon": "Presentation",
+    },
 ]
 
 
@@ -93,6 +109,34 @@ SYSTEM_PROMPTS = {
         "You are a draw.io XML generator. Create valid draw.io/diagrams.net XML that can "
         "be imported directly. Include proper shapes, connectors, labels, and styling for: "
         "flowcharts, system architectures, UML diagrams, research frameworks, network diagrams."
+    ),
+    "poster": (
+        "You are an expert academic poster designer. Generate complete, self-contained HTML with inline CSS "
+        "for an A0-size academic conference poster. Include:\n"
+        "- Title bar with title, authors, affiliations, contact\n"
+        "- Sections: Introduction, Methods, Results, Conclusions, References\n"
+        "- Placeholder boxes for figures labeled [Figure 1], [Figure 2], etc.\n"
+        "- Use a clean 3-column layout with clear section headers\n"
+        "- Color scheme: professional (dark header, white body, accent colors)\n"
+        "- Use CSS Grid or Flexbox for layout\n"
+        "- Font sizes appropriate for poster viewing (title ~72pt, headers ~36pt, body ~24pt)\n"
+        "- Return ONLY the complete HTML document (<!DOCTYPE html>...)</html>)\n"
+        "Make it print-ready at A0 size (841mm × 1189mm)."
+    ),
+    "slides": (
+        "You are an expert academic presentation designer. Generate a complete reveal.js HTML "
+        "slide deck. Include:\n"
+        "- A title slide with title, author, affiliation, date\n"
+        "- Outline slide\n"
+        "- Content slides with bullet points, not walls of text\n"
+        "- Speaker notes in <aside class='notes'> tags\n"
+        "- Placeholder text for figures: [Figure: description]\n"
+        "- A conclusions slide\n"
+        "- A 'Questions?' slide\n"
+        "- Use reveal.js CDN: https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/\n"
+        "- Dark theme (black background, white text, orange accents #F97316)\n"
+        "- Return ONLY the complete HTML document\n"
+        "Keep slides concise — max 5-6 bullet points per slide, each under 10 words."
     ),
 }
 
@@ -296,6 +340,8 @@ async def export_design(req: ExportRequest, user: User = Depends(get_current_use
         "tikz": {"content_type": "application/x-tex", "ext": "tex"},
         "mermaid": {"content_type": "text/plain", "ext": "mmd"},
         "drawio": {"content_type": "application/xml", "ext": "drawio"},
+        "poster": {"content_type": "text/html", "ext": "html"},
+        "slides": {"content_type": "text/html", "ext": "html"},
     }
     mode_info = content_type_map.get(req.mode, {"content_type": "text/plain", "ext": "txt"})
 

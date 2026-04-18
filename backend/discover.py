@@ -502,3 +502,124 @@ async def citation_graph(
         edges=edges,
         project_id=project_id,
     )
+
+
+# ---------- 4. Visual Citation Map (Connected Papers-style) ----------
+
+class CitationMapRequest(BaseModel):
+    seed_doi: str = ""
+    seed_title: str = ""
+    depth: int = 1
+
+
+@router.post("/citation-map")
+async def build_citation_map(
+    req: CitationMapRequest,
+    user: User = Depends(get_current_user),
+):
+    """Build a Connected Papers-style similarity map from a seed paper."""
+    import networkx as nx
+
+    # Find seed paper in OpenAlex
+    if req.seed_doi:
+        search_url = f"https://api.openalex.org/works/doi:{req.seed_doi}"
+    elif req.seed_title:
+        search_url = f"https://api.openalex.org/works?search={req.seed_title}&per_page=1"
+    else:
+        raise HTTPException(status_code=400, detail="Provide a DOI or title")
+
+    async with httpx.AsyncClient(timeout=15) as client:
+        res = await client.get(search_url, headers={"User-Agent": "iKoPilot/1.0"})
+        if res.status_code != 200:
+            raise HTTPException(status_code=502, detail="Could not find seed paper")
+
+    data = res.json()
+    if "results" in data:
+        if not data["results"]:
+            raise HTTPException(status_code=404, detail="Paper not found")
+        seed = data["results"][0]
+    else:
+        seed = data
+
+    seed_id = seed.get("id", "")
+    seed_refs = seed.get("referenced_works", [])[:30]
+
+    # Fetch metadata for referenced papers
+    nodes = {}
+    edges = []
+
+    # Seed node
+    seed_authors = [a.get("author", {}).get("display_name", "") for a in seed.get("authorships", [])[:3]]
+    nodes[seed_id] = {
+        "id": seed_id,
+        "title": seed.get("title", "Untitled"),
+        "authors": seed_authors,
+        "year": seed.get("publication_year"),
+        "citations": seed.get("cited_by_count", 0),
+        "is_seed": True,
+    }
+
+    # Fetch referenced papers in batch
+    ref_ids = [r for r in seed_refs if r.startswith("https://openalex.org/")][:20]
+    if ref_ids:
+        filter_str = "|".join(r.replace("https://openalex.org/", "") for r in ref_ids)
+        batch_url = f"https://api.openalex.org/works?filter=openalex:{filter_str}&per_page=20&select=id,title,authorships,publication_year,cited_by_count,referenced_works"
+
+        async with httpx.AsyncClient(timeout=20) as client:
+            res = await client.get(batch_url, headers={"User-Agent": "iKoPilot/1.0"})
+            if res.status_code == 200:
+                batch_data = res.json().get("results", [])
+                for paper in batch_data:
+                    pid = paper.get("id", "")
+                    authors = [a.get("author", {}).get("display_name", "") for a in paper.get("authorships", [])[:3]]
+                    nodes[pid] = {
+                        "id": pid,
+                        "title": paper.get("title", "Untitled"),
+                        "authors": authors,
+                        "year": paper.get("publication_year"),
+                        "citations": paper.get("cited_by_count", 0),
+                        "is_seed": False,
+                    }
+                    edges.append({"source": seed_id, "target": pid, "type": "cites"})
+
+                    # Bibliographic coupling: shared references between papers
+                    paper_refs = set(paper.get("referenced_works", [])[:30])
+                    seed_ref_set = set(seed_refs)
+                    shared = paper_refs & seed_ref_set
+                    if len(shared) >= 2:
+                        for other_pid, other_node in nodes.items():
+                            if other_pid != pid and other_pid != seed_id:
+                                edges.append({
+                                    "source": pid, "target": other_pid,
+                                    "type": "bibliographic_coupling",
+                                    "weight": len(shared),
+                                })
+
+    # Compute layout using networkx
+    G = nx.Graph()
+    for nid in nodes:
+        G.add_node(nid)
+    for e in edges:
+        if e["source"] in G and e["target"] in G:
+            G.add_edge(e["source"], e["target"], weight=e.get("weight", 1))
+
+    try:
+        pos = nx.spring_layout(G, k=2, iterations=50, seed=42)
+        for nid, (x, y) in pos.items():
+            if nid in nodes:
+                nodes[nid]["x"] = round(float(x), 4)
+                nodes[nid]["y"] = round(float(y), 4)
+    except Exception:
+        # Fallback: random positions
+        import random
+        for i, nid in enumerate(nodes):
+            nodes[nid]["x"] = round(random.uniform(-1, 1), 4)
+            nodes[nid]["y"] = round(random.uniform(-1, 1), 4)
+
+    return {
+        "seed": seed_id,
+        "nodes": list(nodes.values()),
+        "edges": edges,
+        "total_nodes": len(nodes),
+        "total_edges": len(edges),
+    }

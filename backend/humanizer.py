@@ -6,6 +6,7 @@ plagiarism/AI detection scores. Reusable across the entire application.
 """
 
 import io
+import json
 import re
 import difflib
 from pathlib import Path
@@ -819,4 +820,130 @@ async def analyze_readability(
             "short_sentences": short_sentences[:5],
             "repetitive_starts": repetitive_starts,
         },
+    }
+
+
+# ---------- Plagiarism / Originality Pre-Check ----------
+
+@router.post("/originality-check")
+async def originality_check(
+    text: str = "",
+    provider: str = "deepseek",
+    user: User = Depends(get_current_user),
+):
+    """Pre-check text for potential plagiarism and AI-generated content signals."""
+    if not text.strip():
+        raise HTTPException(status_code=400, detail="No text provided")
+
+    # 1. Self-similarity check: find repeated phrases within the text
+    sentences = [s.strip() for s in re.split(r'[.!?]+', text) if len(s.strip()) > 20]
+    self_duplicates = []
+    for i in range(len(sentences)):
+        for j in range(i + 1, len(sentences)):
+            # Simple word overlap ratio
+            words_i = set(sentences[i].lower().split())
+            words_j = set(sentences[j].lower().split())
+            if not words_i or not words_j:
+                continue
+            overlap = len(words_i & words_j) / min(len(words_i), len(words_j))
+            if overlap > 0.7:
+                self_duplicates.append({
+                    "sentence_a": sentences[i][:100],
+                    "sentence_b": sentences[j][:100],
+                    "similarity": round(overlap, 2),
+                })
+        if len(self_duplicates) >= 10:
+            break
+
+    # 2. AI detection signals (statistical approach)
+    words = text.split()
+    total_words = len(words)
+
+    # Sentence length variance (AI text tends to be more uniform)
+    sent_lengths = [len(s.split()) for s in sentences if s]
+    if len(sent_lengths) > 2:
+        import numpy as np
+        length_std = float(np.std(sent_lengths))
+        length_mean = float(np.mean(sent_lengths))
+        length_cv = length_std / length_mean if length_mean > 0 else 0
+    else:
+        length_cv = 0.5
+
+    # Vocabulary diversity
+    unique_words = len(set(w.lower() for w in words))
+    ttr = unique_words / total_words if total_words > 0 else 0
+
+    # Transition word density (AI overuses transitions)
+    transitions = re.findall(
+        r'\b(?:Furthermore|Moreover|Additionally|However|Nevertheless|Consequently|'
+        r'Therefore|In addition|On the other hand|In contrast|Specifically|'
+        r'Notably|Importantly|Significantly|Interestingly)\b',
+        text, re.IGNORECASE
+    )
+    transition_density = len(transitions) / max(len(sentences), 1)
+
+    # Compute AI probability score (heuristic)
+    ai_signals = 0
+    if length_cv < 0.3:  # Very uniform sentence lengths
+        ai_signals += 25
+    elif length_cv < 0.4:
+        ai_signals += 15
+    if ttr < 0.4:  # Low vocabulary diversity
+        ai_signals += 20
+    elif ttr < 0.5:
+        ai_signals += 10
+    if transition_density > 0.3:  # Excessive transitions
+        ai_signals += 20
+    elif transition_density > 0.2:
+        ai_signals += 10
+
+    # Add regex AI pattern score from existing endpoint
+    AI_PATTERNS_QUICK = [
+        r"\bdelve[sd]?\b", r"\bcrucial\b", r"\bpivotal\b",
+        r"\bFurthermore\b", r"\bMoreover\b", r"\bIn conclusion\b",
+        r"\bshed light on\b", r"\brobust\b", r"\bleverage[sd]?\b",
+        r"\bmultifaceted\b", r"\bunderscore[sd]?\b", r"\bparadigm\b",
+        r"\bseamless(?:ly)?\b", r"\bholistic\b", r"\btapestry\b",
+    ]
+    pattern_hits = sum(len(re.findall(p, text, re.IGNORECASE)) for p in AI_PATTERNS_QUICK)
+    if pattern_hits > 5:
+        ai_signals += 20
+    elif pattern_hits > 2:
+        ai_signals += 10
+
+    ai_probability = min(100, ai_signals)
+
+    # 3. LLM deep analysis (optional, for detailed feedback)
+    from litreview import _call_llm
+    system = (
+        "You are a plagiarism and originality reviewer. Analyze this text for:\n"
+        "1. Signs of AI generation (uniformity, overused phrases, lack of personal voice)\n"
+        "2. Potential unattributed borrowing (generic claims without citations)\n"
+        "3. Overall originality assessment\n\n"
+        "Return JSON: {\"originality_score\": 0-100, \"ai_likelihood\": \"low/medium/high\", "
+        "\"concerns\": [\"concern 1\", ...], \"strengths\": [\"strength 1\", ...], "
+        "\"recommendations\": [\"fix 1\", ...]}"
+    )
+
+    llm_analysis = {}
+    try:
+        raw = await _call_llm(system, f"Analyze this text for originality:\n\n{text[:6000]}", provider)
+        cleaned = re.sub(r"^```(?:json)?\s*", "", raw.strip())
+        cleaned = re.sub(r"\s*```$", "", cleaned)
+        llm_analysis = json.loads(cleaned)
+    except Exception:
+        llm_analysis = {"originality_score": 100 - ai_probability, "ai_likelihood": "unknown"}
+
+    return {
+        "word_count": total_words,
+        "sentence_count": len(sentences),
+        "ai_probability": ai_probability,
+        "ai_signals": {
+            "sentence_length_uniformity": round(length_cv, 3),
+            "vocabulary_diversity": round(ttr, 3),
+            "transition_density": round(transition_density, 3),
+            "ai_phrase_count": pattern_hits,
+        },
+        "self_duplicates": self_duplicates[:5],
+        "llm_analysis": llm_analysis,
     }

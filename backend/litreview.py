@@ -724,3 +724,105 @@ def _export_pdf(req: ExportRequest) -> Response:
         media_type="application/pdf",
         headers={"Content-Disposition": f'attachment; filename="{filename}.pdf"'},
     )
+
+
+# ---------- Smart Paper Summarizer ----------
+
+class SummarizePaperRequest(BaseModel):
+    title: str = ""
+    abstract: str = ""
+    full_text: str = ""
+    doi: str = ""
+    provider: str = "deepseek"
+
+
+@router.post("/summarize-paper")
+async def summarize_paper(
+    req: SummarizePaperRequest,
+    user: User = Depends(get_current_user),
+):
+    """Generate a structured summary of an academic paper."""
+    if not req.abstract and not req.full_text:
+        raise HTTPException(status_code=400, detail="Provide at least an abstract or full text")
+
+    content = req.full_text[:10000] if req.full_text else req.abstract
+
+    system = (
+        "You are an academic paper summarizer. Given a paper's content, extract:\n\n"
+        "Return ONLY valid JSON:\n"
+        "{\n"
+        '  "objective": "What the paper aims to do (1-2 sentences)",\n'
+        '  "methodology": "Research methods used (2-3 sentences)",\n'
+        '  "key_findings": ["finding 1", "finding 2", "finding 3"],\n'
+        '  "limitations": ["limitation 1", "limitation 2"],\n'
+        '  "future_work": ["suggestion 1", "suggestion 2"],\n'
+        '  "key_claims": [\n'
+        '    {"claim": "The main claim", "evidence": "Supporting evidence from the paper"}\n'
+        '  ],\n'
+        '  "methods_recipe": ["Step 1: ...", "Step 2: ...", "Step 3: ..."],\n'
+        '  "one_sentence_summary": "Single sentence capturing the paper\'s contribution"\n'
+        "}"
+    )
+
+    user_msg = ""
+    if req.title:
+        user_msg += f"Title: {req.title}\n\n"
+    if req.doi:
+        user_msg += f"DOI: {req.doi}\n\n"
+    user_msg += f"Content:\n{content}"
+
+    try:
+        raw = await _call_llm(system, user_msg, req.provider)
+        cleaned = raw.strip()
+        cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
+        cleaned = re.sub(r"\s*```$", "", cleaned)
+        summary = json.loads(cleaned)
+        summary["title"] = req.title
+        summary["doi"] = req.doi
+        return summary
+    except json.JSONDecodeError:
+        return {
+            "title": req.title,
+            "doi": req.doi,
+            "objective": raw[:500] if raw else "Could not parse summary",
+            "key_findings": [],
+            "limitations": [],
+            "key_claims": [],
+            "one_sentence_summary": "",
+        }
+
+
+class BatchSummarizeRequest(BaseModel):
+    papers: list[dict]  # [{"title": "...", "abstract": "...", "doi": "..."}]
+    provider: str = "deepseek"
+
+
+@router.post("/summarize-batch")
+async def summarize_batch(
+    req: BatchSummarizeRequest,
+    user: User = Depends(get_current_user),
+):
+    """Batch summarize multiple papers. Returns structured summaries for each."""
+    if not req.papers:
+        raise HTTPException(status_code=400, detail="No papers provided")
+    if len(req.papers) > 20:
+        raise HTTPException(status_code=400, detail="Maximum 20 papers per batch")
+
+    summaries = []
+    for paper in req.papers:
+        try:
+            inner_req = SummarizePaperRequest(
+                title=paper.get("title", ""),
+                abstract=paper.get("abstract", ""),
+                doi=paper.get("doi", ""),
+                provider=req.provider,
+            )
+            summary = await summarize_paper(inner_req, user)
+            summaries.append(summary)
+        except Exception as e:
+            summaries.append({
+                "title": paper.get("title", ""),
+                "error": str(e),
+            })
+
+    return {"summaries": summaries, "total": len(summaries)}
